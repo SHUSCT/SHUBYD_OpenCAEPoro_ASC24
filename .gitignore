@@ -17,3 +17,9 @@ OpenCAEPoro/data/test/SUMMARY.out
 OpenCAEPoro/data/test/FastReview.out
 OpenCAEPoro/data/case1/SUMMARY.out
 OpenCAEPoro/data/case1/FastReview.out
+.rsrc/*
+.*
+!.git
+!.gitignore
+OpenCAEPoro/myrank
+OpenCAEPoro/**/statistics.out
