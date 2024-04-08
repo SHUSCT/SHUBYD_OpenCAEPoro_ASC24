@@ -97,7 +97,8 @@ void AllWells::Setup(const Bulk& bk)
 }
 
 
-void AllWells::SetupWellGroup(const Bulk& bk)
+//ctrl  //void AllWells::SetupWellGroup(const Bulk& bk)
+void AllWells::SetupWellGroup()
 {
     wellGroup.clear();
     // Field Group, contain all wells

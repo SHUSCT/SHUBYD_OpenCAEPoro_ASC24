@@ -64,7 +64,8 @@ class MiscibleFactor
 public:
     /// Default constructor
     MiscibleFactor() = default;
-    USI Setup(const ParamReservoir& param, const USI& i, const OCP_USI& nb, const SurfaceTension* st);
+    //ctrl  //USI Setup(const ParamReservoir& param, const USI& i, const OCP_USI& nb, const SurfaceTension* st);
+    USI Setup(const ParamReservoir& param, const OCP_USI& nb, const SurfaceTension* st);
     void CalMiscibleFactor(const OCP_USI& bId, const USI& mIndex) {
         if (ifUse) {
             mfMethod[mIndex]->CalculateMiscibleFactor(bId, surTen->GetVS(), vs);

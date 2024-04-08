@@ -37,7 +37,8 @@ void MisFacMethod01::CalculateMiscibleFactor(const OCP_USI& bId, const SurTenVar
 }
 
 
-USI MiscibleFactor::Setup(const ParamReservoir& param, const USI& i, const OCP_USI& nb, const SurfaceTension* st)
+//ctrl  //USI MiscibleFactor::Setup(const ParamReservoir& param, const USI& i, const OCP_USI& nb, const SurfaceTension* st)
+USI MiscibleFactor::Setup(const ParamReservoir& param, const OCP_USI& nb, const SurfaceTension* st)
 {
     if (param.miscstr.ifMiscible) {
         if (!st->IfUse()) {

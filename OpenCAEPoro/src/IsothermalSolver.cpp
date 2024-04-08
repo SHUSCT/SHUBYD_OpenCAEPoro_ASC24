@@ -101,7 +101,8 @@ void IsothermalSolver::SolveLinearSystem(Reservoir& rs, OCPControl& ctrl)
 { 
     switch (method) {
         case IMPEC:
-            impec.SolveLinearSystem(LSolver, rs, ctrl);
+            //ctrl  //impec.SolveLinearSystem(LSolver, rs, ctrl);
+            impec.SolveLinearSystem(LSolver, rs);
             break;
         case FIM:
             fim.SolveLinearSystem(LSolver, rs, ctrl);
@@ -148,7 +149,8 @@ OCP_BOOL IsothermalSolver::FinishNR(Reservoir& rs, OCPControl& ctrl)
 {
     switch (method) {
         case IMPEC:
-            return impec.FinishNR(rs);
+            //ctrl  //return impec.FinishNR(rs);
+            return impec.FinishNR();
         case FIM:
             return fim.FinishNR(rs, ctrl);
         case AIMc:

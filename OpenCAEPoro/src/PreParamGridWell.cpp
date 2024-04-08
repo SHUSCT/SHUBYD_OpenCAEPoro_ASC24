@@ -29,7 +29,7 @@ void PreParamGridWell::Input(const string& myFilename)
 {
     ifstream ifs(workdir + myFilename, ios::in);
     if (!ifs) {
-        OCP_MESSAGE("Trying to open file: " << (workdir + myFilename));
+        OCP_MESSAGE(std::format("{}{}", "Trying to open file: ", (workdir + myFilename)));
         OCP_ABORT("Failed to open the input file!");
     }
 
@@ -127,7 +127,7 @@ void PreParamGridWell::Input(const string& myFilename)
 
 void PreParamGridWell::CheckInput()
 {
-    cout << endl << "-------------------------------------" << endl;
+    cout << "\n-------------------------------------\n";
     cout << "Check Grid param ... begin" << endl;
 
     if (model == OCPModel::none)           OCP_ABORT("WRONG MODEL!");
@@ -156,7 +156,7 @@ void PreParamGridWell::CheckInput()
     else                                  OCP_ABORT("WRONG Grid Type!");
 
     cout << "Check Grid param ... done";
-    cout << endl << "-------------------------------------" << endl;
+    cout << "\n-------------------------------------" << endl;
 }
 
 

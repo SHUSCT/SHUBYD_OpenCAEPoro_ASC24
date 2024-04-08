@@ -81,15 +81,19 @@ protected:
 	/// Calculate Aj, Bj
 	void CalAjBj( const OCP_DBL* x) const;
 	/// Calculate compressible factor
-	void CalZj(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x) const;
+	//ctrl  //void CalZj(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x) const;
+	void CalZj() const;
 	/// Calculate Aj Bj Zj
 	void CalAjBjZj(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x) const;
 	/// Calculate Ax Bx Zx
-	void CalAxBxZx(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x) const;
+	//ctrl  //void CalAxBxZx(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x) const;
+	void CalAxBxZx(const OCP_DBL* x) const;
 	/// Calculate An Bn Zn
-	void CalAnBnZn(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x, const OCP_DBL& nt) const;
+	//ctrl  //void CalAnBnZn(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x, const OCP_DBL& nt) const;
+	void CalAnBnZn(const OCP_DBL* x, const OCP_DBL& nt) const;
 	/// Calculate Ap Bp Zp
-	void CalApBpZp(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x) const;
+	//ctrl  //void CalApBpZp(const OCP_DBL& P, const OCP_DBL& T,  const OCP_DBL* x) const;
+	void CalApBpZp(const OCP_DBL& P) const;
 	
 protected:
 	USI             nc;

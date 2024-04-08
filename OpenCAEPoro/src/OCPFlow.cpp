@@ -20,13 +20,15 @@
 OCPFlow::OCPFlow(const ParamReservoir& rs_param, const USI& i)
 {
 	if (rs_param.SGOF_T.data.size() > 0 && rs_param.SWOF_T.data.size() > 0) {
-		pfMethod = new OCPFlowMethod_OGW01(rs_param.SGOF_T.data[i], rs_param.SWOF_T.data[i], 1, vs);
+		//pfMethod = new OCPFlowMethod_OGW01(rs_param.SGOF_T.data[i], rs_param.SWOF_T.data[i], 1, vs);
+		pfMethod = new OCPFlowMethod_OGW01(rs_param.SGOF_T.data[i], rs_param.SWOF_T.data[i], vs);
 	}
 	else if (rs_param.SOF3_T.data.size() > 0 &&
 		rs_param.SGFN_T.data.size() > 0 &&
 		rs_param.SWFN_T.data.size() > 0) {
 		pfMethod = new OCPFlowMethod_OGW02(rs_param.SOF3_T.data[i], rs_param.SGFN_T.data[i], 
-			rs_param.SWFN_T.data[i], 1, vs);
+			//ctrl  //rs_param.SWFN_T.data[i], 1, vs);
+			rs_param.SWFN_T.data[i], vs);
 	}
 	else if (rs_param.SWOF_T.data.size() > 0) {
 		pfMethod = new OCPFlowMethod_OW01(rs_param.SWOF_T.data[i], vs);

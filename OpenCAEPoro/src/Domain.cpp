@@ -13,7 +13,8 @@
 
 
 
-void Domain::Setup(const Partition& part, const PreParamGridWell& gridwell)
+//ctrl  //void Domain::Setup(const Partition& part, const PreParamGridWell& gridwell)
+void Domain::Setup(const Partition& part)
 {
 	myComm  = part.myComm;	
 	numproc = part.numproc;
@@ -148,7 +149,8 @@ void Domain::Setup(const Partition& part, const PreParamGridWell& gridwell)
 
 		for (const auto& e : elementCSR) {
 			// num grid, num edges
-			myFile << setw(8) << e[0] << setw(8) << e[1] << setw(8) << e[2] << endl;
+			//ctrl  //myFile << setw(8) << e[0] << setw(8) << e[1] << setw(8) << e[2] << endl;
+			myFile << setw(8) << e[0] << setw(8) << e[1] << setw(8) << e[2] << "\n";
 			const idx_t* my_vtx = &e[3];
 			const idx_t* my_xadj = &e[3 + e[1]];
 			const idx_t* my_edge = &e[3 + e[1] + e[1] + 1];
@@ -157,63 +159,78 @@ void Domain::Setup(const Partition& part, const PreParamGridWell& gridwell)
 			for (int i = 0; i < e[1]; i++) {
 				myFile << setw(8) << my_vtx[i];
 			}
-			myFile << endl;
+			//ctrl  //myFile << endl;
+			myFile << "\n";
 			// vertex
 			for (int i = 0; i < e[1]; i++) {
 				for (int j = my_xadj[i]; j < my_xadj[i + 1]; j++) {
 					myFile << setw(8) << my_vtx[i];
 				}
 			}
-			myFile << endl;
+			//ctrl  //myFile << endl;
+			myFile << "\n";
 			// edges
 			for (int i = 0; i < e[2]; i++) {
 				myFile << setw(8) << my_edge[i];
 			}
-			myFile << endl;
+			//ctrl  //myFile << endl;
+			myFile << "\n";
 			// process
 			for (int i = 0; i < e[2]; i++) {
 				myFile << setw(8) << my_edge_proc[i];
 			}
-			myFile << endl << endl << endl;
+			//ctrl  //myFile << endl << endl << endl;
+			myFile << "\n\n" << endl;
 		}
 
-		myFile << "init_global_to_local" << endl;
+		//ctrl  //myFile << "init_global_to_local" << endl;
+		myFile << "init_global_to_local\n";
 		for (const auto& m : init_global_to_local) {
 			myFile << setw(8) << m.first;
 		}
-		myFile << endl;
+		//ctrl  //myFile << endl;
+		myFile << "\n";
 		for (const auto& m : init_global_to_local) {
 			myFile << setw(8) << m.second;
 		}
-		myFile << endl << endl;
-		myFile << "local_to_init_global" << endl;
+		//ctrl  //myFile << endl << endl;
+		myFile << "\n" << endl;
+		//ctrl  //myFile << "local_to_init_global" << endl;
+		myFile << "local_to_init_global\n";
 		for (int i = 0; i < grid.size(); i++) {
 			myFile << setw(8) << i;
 		}
-		myFile << endl;
+		//ctrl  //myFile << endl;
+		myFile << "\n";
 		for (const auto& e : grid) {
 			myFile << setw(8) << e;
 		}
-		myFile << endl << endl << endl << "send" << endl;
+		//ctrl  //myFile << endl << endl << endl << "send" << endl;
+		myFile << "\n\n\nsend\n";
 		for (const auto& s : send_element_loc) {
 			for (const auto& s1 : s) {
 				myFile << setw(8) << s1;
 			}
-			myFile << endl;
+			//ctrl  //myFile << endl;
+			myFile << "\n";
 		}
-		myFile << endl << endl << endl << "recv" << endl;
+		//ctrl  //myFile << endl << endl << endl << "recv" << endl;
+		myFile << "\n\n\nrecv\n";
 		for (const auto& r : recv_element_loc) {
 			for (const auto& r1 : r) {
 				myFile << setw(8) << r1;
 			}
-			myFile << endl;
+			//ctrl  //myFile << endl;
+			myFile << "\n";
 		}
-		myFile << endl << endl << endl << "well" << endl;
+		//ctrl  //myFile << endl << endl << endl << "well" << endl;
+		myFile << "\n\n\nwell\n";
 		for (USI w = 0; w < well.size(); w++) {
 			myFile << setw(8) << well[w];
 		}
-		myFile << endl << endl << endl;
-		myFile << "Grid Num" << endl;
+		//ctrl  //myFile << endl << endl << endl;
+		//myFile << "Grid Num" << endl;
+		myFile << "\n\n\nGrid Num\n" ;
 		myFile << setw(8) << numElementLocal << setw(8) << numGridInterior
 			<< setw(8) << numWellLocal << setw(8) << numGridGhost << endl;
 		myFile.close();

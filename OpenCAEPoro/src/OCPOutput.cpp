@@ -637,7 +637,7 @@ void Summary::PostProcess(const string& dir, const string& filename, const OCP_I
         ifstream ifs(myFile, ios::in);
 
         if (!ifs) {
-            OCP_MESSAGE("Trying to open file: " << (myFile));
+            OCP_MESSAGE(std::format("{}{}", "Trying to open file: ", (myFile)));
             OCP_ABORT("Failed to open the input file!");
         }
 
@@ -845,10 +845,15 @@ void CriticalInfo::PrintFastReview(const string& dir, const string& filename, co
         OCP_ABORT("Can not open " + FileOut);
     }
 
-    outF << "FastReview OF RUN " + dir + filename
-        << " -- " << iters.GetNumTimeStep() << " time step "
-        << " -- " << iters.GetNRt() << " (+" << iters.GetNRwt() << ") NR step"
-        << " : " << iters.GetLSt() << " (+" << iters.GetLSwt() << ") LS step\n";
+    // outF << "FastReview OF RUN " + dir + filename
+    //     << " -- " << iters.GetNumTimeStep() << " time step "
+    //     << " -- " << iters.GetNRt() << " (+" << iters.GetNRwt() << ") NR step"
+    //     << " : " << iters.GetLSt() << " (+" << iters.GetLSwt() << ") LS step\n";
+    outF << std::format(
+        "FastReview OF RUN {} -- {} time step -- {} (+{}) NR step : {} (+{}) LS step\n",
+        dir + filename, iters.GetNumTimeStep(), iters.GetNRt(), iters.GetNRwt(),
+        iters.GetLSt(), iters.GetLSwt()
+    );
 
     // Item
     for (const auto& v : Sumdata) {
@@ -912,7 +917,7 @@ void CriticalInfo::PostProcess(const string& dir, const string& filename, const 
         ifstream ifs(myFile, ios::in);
 
         if (!ifs) {
-            OCP_MESSAGE("Trying to open file: " << (myFile));
+            OCP_MESSAGE(std::format("{}{}", "Trying to open file: ", myFile));
             OCP_ABORT("Failed to open the input file!");
         }
 
@@ -1672,9 +1677,14 @@ void OCPOutput::PrintInfoSched(const Reservoir&  rs,
 
     // print timing info on the screen
     if (ctrl.printLevel >= PRINT_MIN && myrank == MASTER_PROCESS) {
-        cout << "Timestep " << setw(6) << left << iters.GetNumTimeStep() << ": " << fixed
-             << setw(10) << setprecision(3) << right << days << TIMEUNIT
-             << "    Wall time: " << time / TIME_S2MS << " Sec" << endl;
+        // cout << "Timestep " << setw(6) << left << iters.GetNumTimeStep() << ": " << fixed
+        //      << setw(10) << setprecision(3) << right << days << TIMEUNIT
+        //      << "    Wall time: " << time / TIME_S2MS << " Sec" << endl;
+        std::cout << std::format( 
+            "Timestep {:<6}: {:>10.3f} {}    Wall time: {:>10.3f} Sec\n",
+            iters.GetNumTimeStep(), days, TIMEUNIT, time / TIME_S2MS
+        );
+
     }
 
     // print to output file

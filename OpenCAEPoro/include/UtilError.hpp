@@ -16,11 +16,10 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <format>
 
-/// Print out location at (file, line) and function name
-#define OCP_LOCATION                                                                   \
-    "\n    --> function: " << __PRETTY_FUNCTION__                                      \
-                           << "\n    --> file:     " << __FILE__ << "::" << __LINE__
+#define OCP_LOCATION  \
+    std::format("\n    --> function: {}\n    --> file:     {}::{}", __PRETTY_FUNCTION__, __FILE__, __LINE__)
 
 /// Log error messages
 //  msg: user-defined error message
@@ -28,8 +27,7 @@
 #define OCP_MESSAGE(msg)                                                               \
     do {                                                                               \
         std::ostringstream info;                                                       \
-        info << std::setprecision(16);                                                 \
-        info << msg << OCP_LOCATION << '\n';                                           \
+        info << std::setprecision(16) << std::format("{}{}\n", msg, OCP_LOCATION);     \
         std::cerr << info.str().c_str();                                               \
     } while (false)
 
@@ -38,7 +36,7 @@
 //  We use do-while to allow the macro to be ended with ";"
 #define OCP_WARNING(msg)                                                               \
     do {                                                                               \
-        OCP_MESSAGE("### WARNING: " << (msg));                                         \
+        OCP_MESSAGE(std::format("{}{}", "### WARNING: ", msg));           \
     } while (false)
 
 /// Abort if critical error happens
@@ -46,7 +44,7 @@
 //  We use do-while to allow the macro to be ended with ";"
 #define OCP_ABORT(msg)                                                                 \
     do {                                                                               \
-        OCP_MESSAGE("### ABORT: " << (msg));                                           \
+        OCP_MESSAGE(std::format("{}{}", "### ABORT: ", msg));  \
         std::abort();                                                                  \
     } while (false)
 
@@ -70,10 +68,14 @@
 
 
 /// Print Important Information
-#define OCP_INFO(msg)                                                               \
-    do {                                                                            \
-        std::cout << "###INFO: " << msg << "!\n";                                   \
-    } while (false)                                                                    
+// #define OCP_INFO(msg)                                                               \
+//     do {                                                                            \
+//         std::cout << "###INFO: " << msg << "!\n";                                   \
+//     } while (false)                                                                    
+#define OCP_INFO(msg)  \
+    do {  \
+        std::cout << std::format("###INFO: {}\n", msg);  \
+    } while (false)
 
 
 

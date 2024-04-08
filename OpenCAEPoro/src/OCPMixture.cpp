@@ -38,7 +38,8 @@ OCPMixtureComp::OCPMixtureComp(const ParamReservoir& rs_param, const USI& i, Opt
 /////////////////////////////////////////////////////
 
 
-OCPMixtureK::OCPMixtureK(const ParamReservoir& rs_param, const USI& i, OptionalModules& opts)
+//ctrl  //OCPMixtureK::OCPMixtureK(const ParamReservoir& rs_param, const USI& i, OptionalModules& opts)
+OCPMixtureK::OCPMixtureK(const ParamReservoir& rs_param, const USI& i)
 {
     if (rs_param.PVCO_T.data.size() > 0 &&
         rs_param.PVDG_T.data.size() > 0 &&

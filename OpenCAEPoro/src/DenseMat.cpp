@@ -5,17 +5,16 @@
  *
  *-----------------------------------------------------------------------------------
  *  Copyright (C) 2021--present by the OpenCAEPoroX team. All rights reserved.
- *  Released under the terms of the GNU Lesser General Public License 3.0 or later.
+ *  Released under the terms of the GNU Lesser General Public License 3.0 or
+ *later.
  *-----------------------------------------------------------------------------------
  */
 
 #include "DenseMat.hpp"
 
-
 // WARNING: absolute sum!
-OCP_DBL Dnorm1(const INT& N, OCP_DBL* x)
-{
-#if OCPFLOATTYPEWIDTH == 64   
+OCP_DBL Dnorm1(const INT& N, OCP_DBL* x) {
+#if OCPFLOATTYPEWIDTH == 64
     const INT incx = 1;
     return dasum_(&N, x, &incx);
 #else
@@ -23,8 +22,7 @@ OCP_DBL Dnorm1(const INT& N, OCP_DBL* x)
 #endif
 }
 
-OCP_DBL Dnorm2(const INT& N, OCP_DBL* x)
-{
+OCP_DBL Dnorm2(const INT& N, OCP_DBL* x) {
 #if OCPFLOATTYPEWIDTH == 64
     const INT incx = 1;
     return dnrm2_(&N, x, &incx);
@@ -33,21 +31,9 @@ OCP_DBL Dnorm2(const INT& N, OCP_DBL* x)
 #endif
 }
 
-void Dscalar(const INT& n, const OCP_DBL& alpha, OCP_DBL* x)
-{
 
-#if OCPFLOATTYPEWIDTH == 64
-    // x = a x
-    const int incx = 1;
-    dscal_(&n, &alpha, x, &incx);
-#else
-    OCP_scale(n, alpha, x);
-#endif
 
-}
-
-void Daxpy(const INT& n, const OCP_DBL& alpha, const OCP_DBL* x, OCP_DBL* y)
-{
+void Daxpy(const INT& n, const OCP_DBL& alpha, const OCP_DBL* x, OCP_DBL* y) {
 
 #if OCPFLOATTYPEWIDTH == 64
     // y= ax +y
@@ -58,35 +44,9 @@ void Daxpy(const INT& n, const OCP_DBL& alpha, const OCP_DBL* x, OCP_DBL* y)
 #endif
 }
 
-void DaABpbC(const INT&    m,
-             const INT&    n,
-             const INT&    k,
-             const OCP_DBL& alpha,
-             const OCP_DBL* A,
-             const OCP_DBL* B,
-             const OCP_DBL& beta,
-             OCP_DBL*       C)
-{
-    /*  C' = alpha B'A' + beta C'
-     *  A: m x k
-     *  B: k x n
-     *  C: m x n
-     *  all column majored matrices, no tranpose
-     *  A' in col-order in Fortran = A in row-order in C/Cpp
-     */
 
-#if OCPFLOATTYPEWIDTH == 64
-    const char transa = 'N', transb = 'N';
-    dgemm_(&transa, &transb, &n, &m, &k, &alpha, B, &n, A, &k, &beta, C, &n);
-
-#else
-    OCP_ABpC(m, n, k, A, B, C);
-#endif
-}
-
-
-void LUSolve(const INT& nrhs, const INT& N, OCP_DBL* A, OCP_DBL* b, INT* pivot)
-{
+void LUSolve(const INT& nrhs, const INT& N, OCP_DBL* A, OCP_DBL* b,
+             INT* pivot) {
 
 #if OCPFLOATTYPEWIDTH == 64
     INT info;
@@ -104,8 +64,8 @@ void LUSolve(const INT& nrhs, const INT& N, OCP_DBL* A, OCP_DBL* b, INT* pivot)
 #endif
 }
 
-INT SYSSolve(const INT& nrhs, const OCP_CHAR* uplo, const INT& N, OCP_DBL* A, OCP_DBL* b, INT* pivot, OCP_DBL* work, const INT& lwork)
-{
+INT SYSSolve(const INT& nrhs, const OCP_CHAR* uplo, const INT& N, OCP_DBL* A,
+             OCP_DBL* b, INT* pivot, OCP_DBL* work, const INT& lwork) {
 
 #if OCPFLOATTYPEWIDTH == 64
     INT info;
@@ -122,16 +82,15 @@ INT SYSSolve(const INT& nrhs, const OCP_CHAR* uplo, const INT& N, OCP_DBL* A, OC
 #endif
 }
 
-
-void CalEigenSY(const INT& N, OCP_SIN* A, OCP_SIN* w, OCP_SIN* work, const INT& lwork)
-{
+void CalEigenSY(const INT& N, OCP_SIN* A, OCP_SIN* w, OCP_SIN* work,
+                const INT& lwork) {
 
 #if OCPFLOATTYPEWIDTH == 64
-    INT  info;
-    INT  iwork[1] = { 0 };
-    INT  liwork = 1;
-    char uplo{ 'U' };
-    char Nonly{ 'N' };
+    INT info;
+    INT iwork[1] = {0};
+    INT liwork = 1;
+    char uplo{'U'};
+    char Nonly{'N'};
 
     ssyevd_(&Nonly, &uplo, &N, A, &N, w, work, &lwork, iwork, &liwork, &info);
     if (info > 0) {
@@ -144,27 +103,19 @@ void CalEigenSY(const INT& N, OCP_SIN* A, OCP_SIN* w, OCP_SIN* work, const INT& 
 #endif
 }
 
-
-
-void myDABpCp(const int& m,
-    const int& n,
-    const int& k,
-    const double* A,
-    const double* B,
-    double* C,
-    const int* flag,
-    const int     N)
-{
+void myDABpCp(const int& m, const int& n, const int& k, const double* A,
+              const double* B, double* C, const int* flag, const int N) {
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < k; j++) {
             for (int p = 0; p < 3; p++) {
-                if (flag[p] != 0) C[i * k + j] += A[i * n + p] * B[p * k + j];
+                if (flag[p] != 0)
+                    C[i * k + j] += A[i * n + p] * B[p * k + j];
             }
             for (int p = 0; p < 2; p++) {
                 if (flag[p] != 0) {
                     for (int m = 0; m < N; m++) {
                         C[i * k + j] += A[i * n + 3 + p * (N + 1) + m] *
-                            B[(3 + p * (N + 1) + m) * k + j];
+                                        B[(3 + p * (N + 1) + m) * k + j];
                     }
                 }
             }
@@ -172,16 +123,8 @@ void myDABpCp(const int& m,
     }
 }
 
-
-void myDABpCp1(const int& m,
-    const int& n,
-    const int& k,
-    const double* A,
-    const double* B,
-    double* C,
-    const int* flag,
-    const int     N)
-{
+void myDABpCp1(const int& m, const int& n, const int& k, const double* A,
+               const double* B, double* C, const int* flag, const int N) {
 
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < k; j++) {
@@ -204,15 +147,8 @@ void myDABpCp1(const int& m,
     }
 }
 
-void myDABpCp2(const int& m,
-    const int& n,
-    const int& k,
-    const double* A,
-    const double* B,
-    double* C,
-    const int* flag,
-    const int     N)
-{
+void myDABpCp2(const int& m, const int& n, const int& k, const double* A,
+               const double* B, double* C, const int* flag, const int N) {
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < k; j++) {
             int s = 0;
@@ -233,7 +169,6 @@ void myDABpCp2(const int& m,
         }
     }
 }
-
 
 /*----------------------------------------------------------------------------*/
 /*  Brief Change History of This File                                         */

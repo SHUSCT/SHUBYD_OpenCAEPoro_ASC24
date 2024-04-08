@@ -18,7 +18,8 @@ MixtureUnit::MixtureUnit(const ParamReservoir& rs_param, const USI& i, OptionalM
 		mix = new OCPMixtureComp(rs_param, i, opts);
 	}
 	else {
-		mix = new OCPMixtureK(rs_param, i, opts);
+		//ctrl  //mix = new OCPMixtureK(rs_param, i, opts);
+		mix = new OCPMixtureK(rs_param, i);
 	}
 
 	vs = &mix->GetVarSet();
@@ -28,7 +29,8 @@ MixtureUnit::MixtureUnit(const ParamReservoir& rs_param, const USI& i, OptionalM
 	stMethodIndex = surTen->Setup(rs_param, i, opts.nb);
 	// Miscible Factor
 	misFac = &opts.misFac;
-	mfMethodIndex = misFac->Setup(rs_param, i, opts.nb, surTen);
+	//ctrl  //mfMethodIndex = misFac->Setup(rs_param, i, opts.nb, surTen);
+	mfMethodIndex = misFac->Setup(rs_param, opts.nb, surTen);
 }
 
 

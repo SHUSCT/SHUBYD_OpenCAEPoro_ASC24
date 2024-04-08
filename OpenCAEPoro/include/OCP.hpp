@@ -75,7 +75,8 @@ public:
     }
 
     /// Read Param from an input file.
-    void InputDistParam(const string& filename, PreProcess& prepro, const OCP_INT& myRank);
+    //ctrl  //void InputDistParam(const string& filename, PreProcess& prepro, const OCP_INT& myRank);
+    void InputDistParam(const string& filename, PreProcess& prepro);
 
     /// Setup reservoir based on an internal structure.
     void SetupSimulator(const USI& argc, const char* options[]);

@@ -29,21 +29,24 @@ void BulkConnTransMethod01::CalTrans(BulkConnPair& bp, const Bulk& bk)
     case ConnDirect::xm:
         T1 = bcv.ntg[bId] * bcv.rockKx[bId] * areaB;
         T2 = bcv.ntg[eId] * bcv.rockKx[eId] * areaE;
-        bp.trans = bp.transMult / (1 / T1 + 1 / T2);
+        //ctrl  //bp.trans = bp.transMult / (1 / T1 + 1 / T2);
+        bp.trans = T1 * T2 * bp.transMult / (T1 + T2);
         break;
     case ConnDirect::y:
     case ConnDirect::yp:
     case ConnDirect::ym:
         T1 = bcv.ntg[bId] * bcv.rockKy[bId] * areaB;
         T2 = bcv.ntg[eId] * bcv.rockKy[eId] * areaE;
-        bp.trans = bp.transMult / (1 / T1 + 1 / T2);
+        //ctrl  //bp.trans = bp.transMult / (1 / T1 + 1 / T2);
+        bp.trans = T1 * T2 * bp.transMult / (T1 + T2);
         break;
     case ConnDirect::z:
     case ConnDirect::zp:
     case ConnDirect::zm:
         T1 = bcv.rockKz[bId] * areaB;
         T2 = bcv.rockKz[eId] * areaE;
-        bp.trans = bp.transMult / (1 / T1 + 1 / T2);
+        //ctrl  //bp.trans = bp.transMult / (1 / T1 + 1 / T2);
+        bp.trans = T1 * T2 * bp.transMult / (T1 + T2);
         break;
     case ConnDirect::mf:
     case ConnDirect::fm:
@@ -53,7 +56,8 @@ void BulkConnTransMethod01::CalTrans(BulkConnPair& bp, const Bulk& bk)
         // homogeneous now
         T1 = bcv.ntg[bId] * bcv.rockKx[bId] * areaB;
         T2 = bcv.ntg[eId] * bcv.rockKx[eId] * areaE;
-        bp.trans = bp.transMult / (1 / T1 + 1 / T2);
+        //ctrl  //bp.trans = bp.transMult / (1 / T1 + 1 / T2);
+        bp.trans = T1 * T2 * bp.transMult / (T1 + T2);
         break;
     default:
         OCP_ABORT("Wrong BulkConnType!");

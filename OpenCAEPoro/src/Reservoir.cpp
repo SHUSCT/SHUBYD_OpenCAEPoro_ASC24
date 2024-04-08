@@ -538,7 +538,8 @@ void Reservoir::ApplyControl(const USI& i)
     OCP_FUNCNAME;
 
     allWells.ApplyControl(i);
-    allWells.SetupWellGroup(bulk);
+    //ctrl  //allWells.SetupWellGroup(bulk);
+    allWells.SetupWellGroup();
 }
 
 

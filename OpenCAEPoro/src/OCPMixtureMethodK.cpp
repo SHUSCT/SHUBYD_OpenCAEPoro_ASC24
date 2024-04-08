@@ -518,7 +518,7 @@ void OCPMixtureMethodK_OGW01::InitFlashDer(const OCP_DBL& Vp, OCPMixtureVarSet& 
 }
 
 
-void OCPMixtureMethodK_OGW01::FlashDer(OCPMixtureVarSet& vs)
+void OCPMixtureMethodK_OGW01::FlashDer(OCPMixtureVarSet& vs) //ctrl  化简了部分数学表达式 如4 * 1 + 1直接写为5
 {
 
 	fill(vs.rhoP.begin(), vs.rhoP.end(), 0.0);
@@ -563,12 +563,12 @@ void OCPMixtureMethodK_OGW01::FlashDer(OCPMixtureVarSet& vs)
 			vs.vfi[1]         = 0;   
 			vs.vfi[2]         = vs.vji[2][2];
 
-			vs.dXsdXp[1 * 4 + 2] = 1 / PVDG.CalXiG(vs.P) / vs.Vf;                  // dSg / dNg
+			vs.dXsdXp[6]  = 1 / PVDG.CalXiG(vs.P) / vs.Vf;                  // dSg / dNg
 																			       
-			vs.dXsdXp[2 * 4 + 0] = (vs.vjP[2] - vs.S[2] * vs.vfP) / vs.Vf;         // dSw / dP
-			vs.dXsdXp[2 * 4 + 1] = -vs.S[2] * vs.vfi[0] / vs.Vf;                   // dSw / dNo
-			vs.dXsdXp[2 * 4 + 2] = -vs.S[2] * vs.vfi[1] / vs.Vf;                   // dSw / dNg
-			vs.dXsdXp[2 * 4 + 3] = (vs.vji[2][2] - vs.S[2] * vs.vfi[2]) / vs.Vf;   // dSw / dNw
+			vs.dXsdXp[8]  = (vs.vjP[2] - vs.S[2] * vs.vfP) / vs.Vf;         // dSw / dP
+			vs.dXsdXp[9]  = -vs.S[2] * vs.vfi[0] / vs.Vf;                   // dSw / dNo
+			vs.dXsdXp[10] = -vs.S[2] * vs.vfi[1] / vs.Vf;                   // dSw / dNg
+			vs.dXsdXp[11] = (vs.vji[2][2] - vs.S[2] * vs.vfi[2]) / vs.Vf;   // dSw / dNw
 		}
 		else {
 			// dry gas and water
@@ -614,18 +614,18 @@ void OCPMixtureMethodK_OGW01::FlashDer(OCPMixtureVarSet& vs)
 
 			vs.dXsdXp[1] = vs.vji[0][0] / vs.Vf;   // dSo / dNo
 
-			vs.dXsdXp[1 * 4 + 0] = (vs.vjP[1] - vs.S[1] * vs.vfP) / vs.Vf;        // dSg / dP
-			vs.dXsdXp[1 * 4 + 1] = (vs.vji[1][0] - vs.S[1] * vs.vfi[0]) / vs.Vf;  // dSg / dNo
-			vs.dXsdXp[1 * 4 + 2] = (vs.vji[1][1] - vs.S[1] * vs.vfi[1]) / vs.Vf;  // dSg / dNg
-			vs.dXsdXp[1 * 4 + 3] = -vs.S[1] * vs.vfi[2] / vs.Vf;                  // dSg / dNw
+			vs.dXsdXp[4] = (vs.vjP[1] - vs.S[1] * vs.vfP) / vs.Vf;        // dSg / dP
+			vs.dXsdXp[5] = (vs.vji[1][0] - vs.S[1] * vs.vfi[0]) / vs.Vf;  // dSg / dNo
+			vs.dXsdXp[6] = (vs.vji[1][1] - vs.S[1] * vs.vfi[1]) / vs.Vf;  // dSg / dNg
+			vs.dXsdXp[7] = -vs.S[1] * vs.vfi[2] / vs.Vf;                  // dSg / dNw
 
-			vs.dXsdXp[2 * 4 + 0] = (vs.vjP[2] - vs.S[2] * vs.vfP) / vs.Vf;        // dSw / dP
-			vs.dXsdXp[2 * 4 + 1] = -vs.S[2] * vs.vfi[0] / vs.Vf;                  // dSw / dNo
-			vs.dXsdXp[2 * 4 + 2] = -vs.S[2] * vs.vfi[1] / vs.Vf;                  // dSw / dNg
-			vs.dXsdXp[2 * 4 + 3] = (vs.vji[2][2] - vs.S[2] * vs.vfi[2]) / vs.Vf;  // dSw / dNw
+			vs.dXsdXp[8] = (vs.vjP[2] - vs.S[2] * vs.vfP) / vs.Vf;        // dSw / dP
+			vs.dXsdXp[9] = -vs.S[2] * vs.vfi[0] / vs.Vf;                  // dSw / dNo
+			vs.dXsdXp[10] = -vs.S[2] * vs.vfi[1] / vs.Vf;                  // dSw / dNg
+			vs.dXsdXp[11] = (vs.vji[2][2] - vs.S[2] * vs.vfi[2]) / vs.Vf;  // dSw / dNw
 
-			vs.dXsdXp[3 * 4 + 0]    = -xP / ((1 + x) * (1 + x));               // d Xoo / dP
-			vs.dXsdXp[4 * 4 + 0]    = -vs.dXsdXp[3 * 4 + 0];                      // d Xgo / dP
+			vs.dXsdXp[12]    = -xP / ((1 + x) * (1 + x));               // d Xoo / dP
+			vs.dXsdXp[16]    = -vs.dXsdXp[12];                      // d Xgo / dP
 		}
 	}
 	else if (vs.Ni[1] <= vs.Ni[0] * x) {
@@ -635,8 +635,8 @@ void OCPMixtureMethodK_OGW01::FlashDer(OCPMixtureVarSet& vs)
 		vs.phaseExist[0]  = OCP_TRUE;
 		vs.phaseExist[1]  = OCP_FALSE;
 		vs.phaseExist[2]  = OCP_TRUE;
-		vs.x[0 * 3 + 0]   = 1 / (1 + x);
-		vs.x[0 * 3 + 1]   = 1 - vs.x[0 * 3 + 0];
+		vs.x[0]   = 1 / (1 + x);
+		vs.x[1]   = 1 - vs.x[0];
 
 		// oil property
 		const OCP_DBL rs = x * (stdVg / stdVo);
@@ -675,15 +675,15 @@ void OCPMixtureMethodK_OGW01::FlashDer(OCPMixtureVarSet& vs)
 		vs.dXsdXp[2]         = (vs.vji[0][1] - vs.S[0] * vs.vfi[1]) / vs.Vf;   // dSo / dNg
 		vs.dXsdXp[3]         = -vs.S[0] / vs.Vf * vs.vfi[2];                   // dSo / dNw
 
-		vs.dXsdXp[2 * 4 + 0] = (vs.vjP[2] - vs.S[2] * vs.vfP) / vs.Vf;         // dSw / dP
-		vs.dXsdXp[2 * 4 + 1] = -vs.S[2] * vs.vfi[0] / vs.Vf;                   // dSw / dNo
-		vs.dXsdXp[2 * 4 + 2] = -vs.S[2] * vs.vfi[1] / vs.Vf;                   // dSw / dNg
-		vs.dXsdXp[2 * 4 + 3] = (vs.vji[2][2] - vs.S[2] * vs.vfi[2]) / vs.Vf;   // dSw / dNw
+		vs.dXsdXp[8]  = (vs.vjP[2] - vs.S[2] * vs.vfP) / vs.Vf;         // dSw / dP
+		vs.dXsdXp[9]  = -vs.S[2] * vs.vfi[0] / vs.Vf;                   // dSw / dNo
+		vs.dXsdXp[10] = -vs.S[2] * vs.vfi[1] / vs.Vf;                   // dSw / dNg
+		vs.dXsdXp[11] = (vs.vji[2][2] - vs.S[2] * vs.vfi[2]) / vs.Vf;   // dSw / dNw
 
-		vs.dXsdXp[3 * 4 + 1] = vs.Ni[1] / pow((vs.Ni[0] + vs.Ni[1]), 2);       // d Xoo / d No
-		vs.dXsdXp[3 * 4 + 2] = -vs.Ni[0] / pow((vs.Ni[0] + vs.Ni[1]), 2);      // d Xoo / d Ng
-		vs.dXsdXp[4 * 4 + 1] = -vs.dXsdXp[3 * 4 + 1];                          // d Xgo / d No
-		vs.dXsdXp[4 * 4 + 2] = -vs.dXsdXp[3 * 4 + 2];                          // d Xgo / d Ng
+		vs.dXsdXp[13] = vs.Ni[1] / pow((vs.Ni[0] + vs.Ni[1]), 2);       // d Xoo / d No
+		vs.dXsdXp[14] = -vs.Ni[0] / pow((vs.Ni[0] + vs.Ni[1]), 2);      // d Xoo / d Ng
+		vs.dXsdXp[17] = -vs.dXsdXp[13];                          // d Xgo / d No
+		vs.dXsdXp[18] = -vs.dXsdXp[14];                          // d Xgo / d Ng
 
 		const OCP_DBL tmp_new = (1 + x) * (1 + x);
 		vs.mux[0]       = -muox * tmp_new;         // dMuo / dXoo
@@ -712,8 +712,8 @@ void OCPMixtureMethodK_OGW01::FlashDer(OCPMixtureVarSet& vs)
 		x = rs * (stdVo / stdVg);
 		const OCP_DBL xP = rsP * (stdVo / stdVg);
 
-		vs.x[0 * 3 + 0] = 1 / (1 + x);
-		vs.x[0 * 3 + 1] = 1 - vs.x[0 * 3 + 0];
+		vs.x[0] = 1 / (1 + x);
+		vs.x[1] = 1 - vs.x[0];
 
 		// total
 		vs.vj[0]  = vs.Ni[0] * (1 + x) / vs.xi[0];
@@ -737,23 +737,23 @@ void OCPMixtureMethodK_OGW01::FlashDer(OCPMixtureVarSet& vs)
 		vs.vfi[1]    = vs.vji[1][1];
 		vs.vfi[2]    = vs.vji[2][2];
 
-		vs.dXsdXp[0 * 4 + 0] = (vs.vjP[0] - vs.S[0] * vs.vfP) / vs.Vf;           // dSo / dP
-		vs.dXsdXp[0 * 4 + 1] = (vs.vji[0][0] - vs.S[0] * vs.vfi[0]) / vs.Vf;     // dSo / dNo
-		vs.dXsdXp[0 * 4 + 2] = -vs.S[0] * vs.vfi[1] / vs.Vf;                     // dSo / dNg
-		vs.dXsdXp[0 * 4 + 3] = -vs.S[0] * vs.vfi[2] / vs.Vf;                     // dSo / dNw
+		vs.dXsdXp[0] = (vs.vjP[0] - vs.S[0] * vs.vfP) / vs.Vf;           // dSo / dP
+		vs.dXsdXp[1] = (vs.vji[0][0] - vs.S[0] * vs.vfi[0]) / vs.Vf;     // dSo / dNo
+		vs.dXsdXp[2] = -vs.S[0] * vs.vfi[1] / vs.Vf;                     // dSo / dNg
+		vs.dXsdXp[3] = -vs.S[0] * vs.vfi[2] / vs.Vf;                     // dSo / dNw
 
-		vs.dXsdXp[1 * 4 + 0] = (vs.vjP[1] - vs.S[1] * vs.vfP) / vs.Vf;           // dSg / dP  
-		vs.dXsdXp[1 * 4 + 1] = (vs.vji[1][0] - vs.S[1] * vs.vfi[0]) / vs.Vf;     // dSg / dNo
-		vs.dXsdXp[1 * 4 + 2] = (vs.vji[1][1] - vs.S[1] * vs.vfi[1]) / vs.Vf;     // dSg / dNg
-		vs.dXsdXp[1 * 4 + 3] = -vs.S[1] * vs.vfi[2] / vs.Vf;                     // dSg / dNw
+		vs.dXsdXp[4] = (vs.vjP[1] - vs.S[1] * vs.vfP) / vs.Vf;           // dSg / dP  
+		vs.dXsdXp[5] = (vs.vji[1][0] - vs.S[1] * vs.vfi[0]) / vs.Vf;     // dSg / dNo
+		vs.dXsdXp[6] = (vs.vji[1][1] - vs.S[1] * vs.vfi[1]) / vs.Vf;     // dSg / dNg
+		vs.dXsdXp[7] = -vs.S[1] * vs.vfi[2] / vs.Vf;                     // dSg / dNw
 
-		vs.dXsdXp[2 * 4 + 0] = (vs.vjP[2] - vs.S[2] * vs.vfP) / vs.Vf;           // dSw / dP
-		vs.dXsdXp[2 * 4 + 1] = -vs.S[2] * vs.vfi[0] / vs.Vf;                     // dSw / dNo
-		vs.dXsdXp[2 * 4 + 2] = -vs.S[2] * vs.vfi[1] / vs.Vf;                     // dSw / dNg
-		vs.dXsdXp[2 * 4 + 3] = (vs.vji[2][2] - vs.S[2] * vs.vfi[2]) / vs.Vf;     // dSw / dNw
+		vs.dXsdXp[8]  = (vs.vjP[2] - vs.S[2] * vs.vfP) / vs.Vf;           // dSw / dP
+		vs.dXsdXp[9]  = -vs.S[2] * vs.vfi[0] / vs.Vf;                     // dSw / dNo
+		vs.dXsdXp[10] = -vs.S[2] * vs.vfi[1] / vs.Vf;                     // dSw / dNg
+		vs.dXsdXp[11] = (vs.vji[2][2] - vs.S[2] * vs.vfi[2]) / vs.Vf;     // dSw / dNw
 
-		vs.dXsdXp[3 * 4 + 0] = -xP / ((1 + x) * (1 + x));                        // d Xoo / dP
-		vs.dXsdXp[4 * 4 + 0] = -vs.dXsdXp[3 * 4 + 0];                            // d Xgo / dP
+		vs.dXsdXp[12] = -xP / ((1 + x) * (1 + x));                        // d Xoo / dP
+		vs.dXsdXp[16] = -vs.dXsdXp[12];                                   // d Xgo / dP
 	}
 }
 

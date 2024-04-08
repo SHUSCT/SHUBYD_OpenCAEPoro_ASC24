@@ -56,12 +56,16 @@ const vector<OCP_DBL>& BulkAccumuTerm01::CaldFdXpFIM(const OCP_USI& bId, const B
 	}
 
     if (optM->boundary.boundaryFlow.IfUse(bId)) {
-        const OCP_DBL dP = (bvs.Pj[bId * 2 + 0] - GRAVITY_FACTOR * bvs.rho[bId * 2 + 0] * bvs.depth[bId]) -
-            (METRIC_PRESSURE_STD - GRAVITY_FACTOR * bvs.rho[bId * 2 + 0] * -1.2E2);
-        OCP_DBL tmp = dt * CONV_DARCY * optM->boundary.boundArea[bId]
-            * bvs.kr[bId * 2 + 0] / bvs.mu[bId * 2 + 0] * (1.0 - GRAVITY_FACTOR * bvs.rhoP[bId * 2 + 0] * bvs.depth[bId]
-                + GRAVITY_FACTOR * bvs.rhoP[bId * 2 + 0] * bvs.depth[bId] * -1.2E2);
-        tmp += -dt * CONV_DARCY * optM->boundary.boundArea[bId] * bvs.kr[bId * 2 + 0] * dP * bvs.muP[bId * 2 + 0] / (bvs.mu[bId * 2 + 0] * bvs.mu[bId * 2 + 0]);
+        const OCP_DBL dP = (-1.2E2 - bvs.depth[bId]) * GRAVITY_FACTOR * bvs.rho[bId * 2 + 0] - METRIC_PRESSURE_STD + bvs.Pj[bId * 2 + 0];
+        const OCP_DBL tmp = dt * CONV_DARCY * optM->boundary.boundArea[bId] * bvs.kr[bId * 2 + 0] / bvs.mu[bId * 2 + 0] * 
+                      (1.0 + GRAVITY_FACTOR * bvs.rhoP[bId * 2 + 0] * bvs.depth[bId] * (-1.2E2 - 1) - dP * bvs.muP[bId * 2 + 0] 
+                      / bvs.mu[bId * 2 + 0]);
+        //ctrl  // const OCP_DBL dP = (bvs.Pj[bId * 2 + 0] - GRAVITY_FACTOR * bvs.rho[bId * 2 + 0] * bvs.depth[bId]) -
+        //     (METRIC_PRESSURE_STD - GRAVITY_FACTOR * bvs.rho[bId * 2 + 0] * -1.2E2);
+        // OCP_DBL tmp = dt * CONV_DARCY * optM->boundary.boundArea[bId]
+        //     * bvs.kr[bId * 2 + 0] / bvs.mu[bId * 2 + 0] * (1.0 - GRAVITY_FACTOR * bvs.rhoP[bId * 2 + 0] * bvs.depth[bId]
+        //         + GRAVITY_FACTOR * bvs.rhoP[bId * 2 + 0] * bvs.depth[bId] * -1.2E2);
+        // tmp += -dt * CONV_DARCY * optM->boundary.boundArea[bId] * bvs.kr[bId * 2 + 0] * dP * bvs.muP[bId * 2 + 0] / (bvs.mu[bId * 2 + 0] * bvs.mu[bId * 2 + 0]);
         dFdXp[(1 + bvs.w) * dim + 0] += tmp;
     }
 

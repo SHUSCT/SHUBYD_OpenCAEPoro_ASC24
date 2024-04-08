@@ -59,7 +59,8 @@ class OCPFlowMethod_OGW01 : public OCPFlowMethod
 public:
     OCPFlowMethod_OGW01(const vector<vector<OCP_DBL>>& SGOFin,
         const vector<vector<OCP_DBL>>& SWOFin,
-        const USI& i, OCPFlowVarSet& vs);
+        //ctrl  //const USI& i, OCPFlowVarSet& vs);
+        OCPFlowVarSet& vs);
     void CalKrPc(OCPFlowVarSet& vs) override;
     void CalKrPcDer(OCPFlowVarSet& vs) override;
     OCP_DBL GetSwco() const override { return SWOF.GetSwco(); }
@@ -98,7 +99,8 @@ public:
     OCPFlowMethod_OGW02(const vector<vector<OCP_DBL>>& SOF3in,
         const vector<vector<OCP_DBL>>& SGFNin,
         const vector<vector<OCP_DBL>>& SWFNin,
-        const USI& i, OCPFlowVarSet& vs);
+        //ctrl  //const USI& i, OCPFlowVarSet& vs);
+        OCPFlowVarSet& vs);
     void CalKrPc(OCPFlowVarSet& vs) override;
     void CalKrPcDer(OCPFlowVarSet& vs) override;
 

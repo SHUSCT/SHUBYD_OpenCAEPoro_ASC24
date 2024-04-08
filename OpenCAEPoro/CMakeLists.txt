@@ -1,4 +1,3 @@
-# Main CMakeLists file for OpenCAEPoroX
 #
 # Sample usages:
 #   cmake .                             // build in default configuration
@@ -20,11 +19,26 @@
 cmake_minimum_required(VERSION 3.13)
 cmake_policy(SET CMP0076 NEW)
 
+
 # Name of the project: should appear after find_program
-project(OpenCAEPoroX C CXX)
+project(OpenCAEPoroX C CXX CUDA)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 23)
+
+# Chekc & Add CUDA Tolkit
+include(CheckLanguage)
+if(NOT CUDAToolkit_FOUND)
+    include(FindCUDAToolkit)
+endif()
+include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+find_package(CUDAToolkit REQUIRED)
+
+# Define CUDA C++ Version
+check_language(CUDA)
+set(CMAKE_C_COMPILER "/home/jovyan/spack/opt/spack/linux-ubuntu22.04-icelake/gcc-11.4.0/gcc-13.2.0-bgq64dd7kw2njs367vx75e34rfgfrfey/bin/gcc")
+set(CMAKE_CXX_COMPILER "/home/jovyan/spack/opt/spack/linux-ubuntu22.04-icelake/gcc-11.4.0/gcc-13.2.0-bgq64dd7kw2njs367vx75e34rfgfrfey/bin/g++")
+set(CMAKE_CUDA_HOST_COMPILER "/usr/bin/g++")
 
 # Set module lookup path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/modules)
@@ -49,6 +63,8 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(LIBNAME OpenCAEPoroX CACHE INTERNAL "The library name")
 add_library(OpenCAEPoroX STATIC)
 
+target_link_libraries(OpenCAEPoroX PRIVATE CUDA::cublas)
+
 ###############################################################################
 ## External dependencies
 ###############################################################################
@@ -67,8 +83,9 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /DDEBUG /W4")
 else()
     # Compiler flags for Linux or Mac OS X
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 ")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -mavx512f")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -Wall -g")
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lcublas")
 endif()
 
 ###############################################################################

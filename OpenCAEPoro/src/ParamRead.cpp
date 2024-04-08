@@ -59,7 +59,7 @@ void ParamRead::ReadFile(const string& filename)
 {
     ifstream ifs(filename, ios::in);
     if (!ifs) {
-        OCP_MESSAGE("Trying to open file: " << (filename));
+        OCP_MESSAGE(std::format("{}{}", "Trying to open file: ", (filename)));
         OCP_ABORT("Failed to open the input file!");
     }
 

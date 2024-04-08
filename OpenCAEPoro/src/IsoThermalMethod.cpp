@@ -76,7 +76,8 @@ void IsoT_IMPEC::AssembleMat(LinearSystem&    ls,
     AssembleMatWells(ls, rs, dt);
 }
 
-void IsoT_IMPEC::SolveLinearSystem(LinearSystem& ls, Reservoir& rs, OCPControl& ctrl)
+//ctrl  //void IsoT_IMPEC::SolveLinearSystem(LinearSystem& ls, Reservoir& rs, OCPControl& ctrl)
+void IsoT_IMPEC::SolveLinearSystem(LinearSystem& ls, Reservoir& rs)
 {
 #ifdef DEBUG
     ls.CheckEquation();
@@ -149,7 +150,8 @@ OCP_BOOL IsoT_IMPEC::UpdateProperty(Reservoir& rs, OCPControl& ctrl)
     // Fouth check: Volume error check
     if (!NR.CheckPhysical(rs, { "BulkVe" })) {
         ctrl.time.CutDt(NR);
-        ResetToLastTimeStep02(rs, ctrl);
+        //ctrl  //ResetToLastTimeStep02(rs, ctrl);
+        ResetToLastTimeStep02(rs);
         return OCP_FALSE;
     }
 
@@ -159,7 +161,8 @@ OCP_BOOL IsoT_IMPEC::UpdateProperty(Reservoir& rs, OCPControl& ctrl)
     return OCP_TRUE;
 }
 
-OCP_BOOL IsoT_IMPEC::FinishNR(const Reservoir& rs) { return OCP_TRUE; }
+//ctrl  //OCP_BOOL IsoT_IMPEC::FinishNR(const Reservoir& rs) { return OCP_TRUE; }
+OCP_BOOL IsoT_IMPEC::FinishNR() { return OCP_TRUE; }
 
 void IsoT_IMPEC::FinishStep(Reservoir& rs, OCPControl& ctrl)
 {
@@ -578,7 +581,8 @@ void IsoT_IMPEC::ResetToLastTimeStep01(Reservoir& rs, OCPControl& ctrl)
     NR.ResetIter();
 }
 
-void IsoT_IMPEC::ResetToLastTimeStep02(Reservoir& rs, OCPControl& ctrl)
+//ctrl  //void IsoT_IMPEC::ResetToLastTimeStep02(Reservoir& rs, OCPControl& ctrl)
+void IsoT_IMPEC::ResetToLastTimeStep02(Reservoir& rs)
 {
     Bulk&       bk  = rs.bulk;
     BulkVarSet& bvs = bk.vs;
@@ -1182,6 +1186,7 @@ void IsoT_FIM::AssembleMatBulks(LinearSystem&    ls,
 
         // End
         bmat = Flux->GetdFdXpE();
+        // [TODO] This function is the most time-consuming part in assemble step.
         DaABpbC(ncol, ncol, ncol2, 1, Flux->GetdFdXsE().data(), &bvs.dSec_dPri[eId * bsize2], 1,
             bmat.data());
         Dscalar(bsize, dt, bmat.data());

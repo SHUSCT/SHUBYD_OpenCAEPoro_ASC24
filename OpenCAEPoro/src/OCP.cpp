@@ -12,7 +12,8 @@
 #include "OCP.hpp"
 
 /// Read Param from input file
-void OpenCAEPoroX::InputDistParam(const string& filename, PreProcess& prepro, const OCP_INT& myRank)
+//ctrl  //void OpenCAEPoroX::InputDistParam(const string& filename, PreProcess& prepro, const OCP_INT& myRank)
+void OpenCAEPoroX::InputDistParam(const string& filename, PreProcess& prepro)
 {
 
     GetWallTime timer;
@@ -49,12 +50,14 @@ void OpenCAEPoroX::SetupSimulator(const USI& argc, const char* options[])
         switch (control.GetModel()) {
         case OCPModel::isothermal:
             if (control.printLevel >= PRINT_MIN) {
-                cout << endl << "Dynamic simulation for isothermal models" << endl;
+                //ctrl  //cout << endl << "Dynamic simulation for isothermal models" << endl;
+                cout << "/nDynamic simulation for isothermal models" << endl;
             }
             break;
         case OCPModel::thermal:
             if (control.printLevel >= PRINT_MIN) {
-                cout << endl << "Dynamic simulation for thermal models" << endl;
+                //ctrl  //cout << endl << "Dynamic simulation for thermal models" << endl;
+                cout << "/mDynamic simulation for thermal models" << endl;
             }
             break;
         default:
@@ -70,8 +73,8 @@ void OpenCAEPoroX::SetupSimulator(const USI& argc, const char* options[])
 
     double finalTime = timer.Stop() / TIME_S2MS;
     if (control.printLevel >= PRINT_MIN && CURRENT_RANK == MASTER_PROCESS) {
-        cout << endl
-             << "Setup simulation done. Wall time : " << fixed << setprecision(3)
+        //ctrl  //cout << endl
+        cout << "\nSetup simulation done. Wall time : " << fixed << setprecision(3)
              << finalTime << " Sec" << endl;
     }
 
@@ -99,8 +102,8 @@ void OpenCAEPoroX::InitReservoir()
 
     double finalTime = timer.Stop() / TIME_S2MS;
     if (control.printLevel >= PRINT_MIN && CURRENT_RANK == MASTER_PROCESS) {
-        cout << endl
-             << "Initialization done. Wall time : " << fixed << setprecision(3)
+        //ctrl  //cout << endl
+        cout << "\nInitialization done. Wall time : " << fixed << setprecision(3)
              << finalTime << " Sec" << endl;
     }
 

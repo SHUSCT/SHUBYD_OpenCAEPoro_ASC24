@@ -14,6 +14,9 @@
 #include <iostream>
 #include <string>
 #include <mpi.h>
+#include <format>
+#include <omp.h>
+#include <string.h>
 
 // OpenCAEPoroX header files
 #include "OCP.hpp"
@@ -53,7 +56,8 @@ int main(int argc, char* argv[])
         PreProcess preProcess(argv[1], myRank, MPI_COMM_WORLD);
 
         // Step 2. Input reservoir information and distribute
-        simulator.InputDistParam(argv[1], preProcess, myRank);
+        //ctrl  //simulator.InputDistParam(argv[1], preProcess, myRank);
+        simulator.InputDistParam(argv[1], preProcess);
     }
 
     // Step 3. Setup params

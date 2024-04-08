@@ -18,7 +18,8 @@
 
 OCPFlowMethod_OGW01::OCPFlowMethod_OGW01(const vector<vector<OCP_DBL>>& SGOFin,
 	const vector<vector<OCP_DBL>>& SWOFin,
-	const USI& i, OCPFlowVarSet& vs)
+	//ctrl  //const USI& i, OCPFlowVarSet& vs)
+	OCPFlowVarSet& vs)
 {
 	vs.Init(OCPFlowType::OGW, 3, 3);
 
@@ -79,7 +80,8 @@ void OCPFlowMethod_OGW01::CalKrPcDer(OCPFlowVarSet& vs)
 OCPFlowMethod_OGW02::OCPFlowMethod_OGW02(const vector<vector<OCP_DBL>>& SOF3in,
 	const vector<vector<OCP_DBL>>& SGFNin,
 	const vector<vector<OCP_DBL>>& SWFNin,
-	const USI& i, OCPFlowVarSet& vs)
+	//ctrl  //const USI& i, OCPFlowVarSet& vs)
+	OCPFlowVarSet& vs)
 {
 	vs.Init(OCPFlowType::OGW, 3, 3);
 

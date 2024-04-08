@@ -285,10 +285,7 @@ void PeacemanWell::CalWI(const Bulk& bk)
                     const OCP_DBL kykz = bvs.rockKy[Idb] * bvs.rockKz[Idb];
                     const OCP_DBL ky_kz = bvs.rockKy[Idb] / bvs.rockKz[Idb];
                     assert(kykz > 0);
-                    ro = 0.28 * pow((dy * dy * pow(1 / ky_kz, 0.5) +
-                        dz * dz * pow(ky_kz, 0.5)),
-                        0.5);
-                    ro /= (pow(ky_kz, 0.25) + pow(1 / ky_kz, 0.25));
+                    ro = 0.28 * sqrt(ky_kz * dz * dz + dy * dy) / (sqrt(ky_kz) + 1);
 
                     if (perf[p].kh < 0) {
                         perf[p].kh = (dx * pow(kykz, 0.5));
@@ -301,10 +298,7 @@ void PeacemanWell::CalWI(const Bulk& bk)
                     const OCP_DBL kzkx = bvs.rockKz[Idb] * bvs.rockKx[Idb];
                     const OCP_DBL kz_kx = bvs.rockKz[Idb] / bvs.rockKx[Idb];
                     assert(kzkx > 0);
-                    ro = 0.28 * pow((dz * dz * pow(1 / kz_kx, 0.5) +
-                        dx * dx * pow(kz_kx, 0.5)),
-                        0.5);
-                    ro /= (pow(kz_kx, 0.25) + pow(1 / kz_kx, 0.25));
+                    ro = 0.28 * sqrt(kz_kx * dx * dx + dz * dz) / (sqrt(kz_kx) + 1);
 
                     if (perf[p].kh < 0) {
                         perf[p].kh = (dy * pow(kzkx, 0.5));
@@ -317,10 +311,7 @@ void PeacemanWell::CalWI(const Bulk& bk)
                     const OCP_DBL kxky = bvs.rockKx[Idb] * bvs.rockKy[Idb];
                     const OCP_DBL kx_ky = bvs.rockKx[Idb] / bvs.rockKy[Idb];
                     assert(kxky > 0);
-                    ro = 0.28 * pow((dx * dx * pow(1 / kx_ky, 0.5) +
-                        dy * dy * pow(kx_ky, 0.5)),
-                        0.5);
-                    ro /= (pow(kx_ky, 0.25) + pow(1 / kx_ky, 0.25));
+                    ro = 0.28 * sqrt(kx_ky * dy * dy + dx * dx) / (sqrt(kx_ky) + 1);
 
                     if (perf[p].kh < 0) {
                         perf[p].kh = (dz * pow(kxky, 0.5));
@@ -380,7 +371,7 @@ void PeacemanWell::CalTrans(const Bulk& bk)
             // multi phase
             for (USI j = 0; j < np; j++) {
                 perf[p].transj[j] = 0;
-                OCP_USI id = k * np + j;
+                const OCP_USI id = k * np + j;
                 if (bvs.phaseExist[id]) {
                     perf[p].transj[j] = temp * bvs.kr[id] / bvs.mu[id];
                 }

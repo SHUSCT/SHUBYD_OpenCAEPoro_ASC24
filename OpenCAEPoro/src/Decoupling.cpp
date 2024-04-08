@@ -92,7 +92,7 @@ static void decouple_anl(dBSRmat* A, OCP_DBL* diaginv, dBSRmat* B)
         // compute D^{-1}*A
         for (k = IA[i]; k < IA[i + 1]; ++k) {
             m = k * nb2;
-            fasp_blas_smat_mul(diaginv + i * nb2, val + m, valb + m, nb);
+            fasp_blas_smat_mul(diaginv + i * nb2, DaABpbCval + m, valb + m, nb);
         }
     } // end of main loop
 }

@@ -48,7 +48,8 @@ class Domain
 	friend class SamgSolver;
 
 public:
-	void Setup(const Partition& part, const PreParamGridWell& gridwell);
+	//ctrl  //void Setup(const Partition& part, const PreParamGridWell& gridwell);
+	void Setup(const Partition& part);
 	auto GetNumGridTotal() const { return numElementTotal - numWellTotal; }
 	auto GetNumGridInterior() const { return numGridInterior; }
 	auto GetWell() const { return well; }

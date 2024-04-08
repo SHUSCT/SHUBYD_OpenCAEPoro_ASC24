@@ -47,11 +47,13 @@ public:
     /// Assemble Matrix
     void AssembleMat(LinearSystem& ls, const Reservoir& rs, const OCP_DBL& dt) const;
     /// Solve the linear system.
-    void SolveLinearSystem(LinearSystem& ls, Reservoir& rs, OCPControl& ctrl);
+    //ctrl  //void SolveLinearSystem(LinearSystem& ls, Reservoir& rs, OCPControl& ctrl);
+    void SolveLinearSystem(LinearSystem& ls, Reservoir& rs);
     /// Update properties of fluids.
     OCP_BOOL UpdateProperty(Reservoir& rs, OCPControl& ctrl);
     /// Determine if NR iteration finishes.
-    OCP_BOOL FinishNR(const Reservoir& rs);
+    //ctrl  //OCP_BOOL FinishNR(const Reservoir& rs);
+    OCP_BOOL FinishNR();
     void     FinishStep(Reservoir& rs, OCPControl& ctrl);
 
 protected:
@@ -83,7 +85,7 @@ private:
     void GetSolution(Reservoir& rs, vector<OCP_DBL>& u);
     /// Reset variables to last time step
     void ResetToLastTimeStep01(Reservoir& rs, OCPControl& ctrl);
-    void ResetToLastTimeStep02(Reservoir& rs, OCPControl& ctrl);
+    void ResetToLastTimeStep02(Reservoir& rs);
     /// Update values of last step for FIM.
     void UpdateLastTimeStep(Reservoir& rs) const;
 };

@@ -123,7 +123,8 @@ class OCPMixtureK : public OCPMixture
 {
 public:
     OCPMixtureK() = default;
-    OCPMixtureK(const ParamReservoir& rs_param, const USI& i, OptionalModules& opts);
+    //ctrl  //OCPMixtureK(const ParamReservoir& rs_param, const USI& i, OptionalModules& opts);
+    OCPMixtureK(const ParamReservoir& rs_param, const USI& i);
     void Flash(const OCP_DBL& P, const OCP_DBL& T, const OCP_DBL* Ni) override {
         pmMethod->SetVarSet(P, T, Ni, vs);
         pmMethod->Flash(vs);

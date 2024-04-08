@@ -81,7 +81,8 @@ public:
     /// Setup wells
     void Setup(const Bulk& bk);
     /// Setup information of wellGroup
-    void SetupWellGroup(const Bulk& bk);
+    //ctrl  //void SetupWellGroup(const Bulk& bk);
+    void SetupWellGroup();
     /// Setup bulks which are penetrated by wells at current stage
     void SetupWellBulk(Bulk& bk) const;
 
