@@ -29,8 +29,8 @@ void PreParamGridWell::Input(const string& myFilename)
 {
     ifstream ifs(workdir + myFilename, ios::in);
     if (!ifs) {
-        OCP_MESSAGE(std::format("{}{}", "Trying to open file: ", (workdir + myFilename)));
-        OCP_ABORT("Failed to open the input file!");
+        // OCP_MESSAGE(std::format("{}{}", "Trying to open file: ", (workdir + myFilename)));
+        // OCP_ABORT("Failed to open the input file!");
     }
 
     while (!ifs.eof()) {

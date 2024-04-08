@@ -538,7 +538,7 @@ void myDABpCp2(const int& m,
 template <typename T>
 void PrintDX(const int& N, const T* x) {
     for (int i = 0; i < N; i++) {
-        std::cout << std::format("{:d}   {:f}\n", i, x[i]);
+        // std::cout << std::format("{:d}   {:f}\n", i, x[i]);
     }
     cout << endl;
 }

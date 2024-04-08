@@ -16,37 +16,37 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <format>
+// #include <format>
 
 #define OCP_LOCATION  \
-    std::format("\n    --> function: {}\n    --> file:     {}::{}", __PRETTY_FUNCTION__, __FILE__, __LINE__)
+    // std::format("\n    --> function: {}\n    --> file:     {}::{}", __PRETTY_FUNCTION__, __FILE__, __LINE__)
 
 /// Log error messages
 //  msg: user-defined error message
 //  We use do-while to allow the macro to be ended with ";"
 #define OCP_MESSAGE(msg)                                                               \
-    do {                                                                               \
-        std::ostringstream info;                                                       \
-        info << std::setprecision(16) << std::format("{}{}\n", msg, OCP_LOCATION);     \
-        std::cerr << info.str().c_str();                                               \
-    } while (false)
+    // do {                                                                               \
+    //     std::ostringstream info;                                                       \
+    //     info << std::setprecision(16) << std::format("{}{}\n", msg, OCP_LOCATION);     \
+    //     std::cerr << info.str().c_str();                                               \
+    // } while (false)
 
 /// Log warning messages
 //  msg: user-defined warning message
 //  We use do-while to allow the macro to be ended with ";"
 #define OCP_WARNING(msg)                                                               \
-    do {                                                                               \
-        OCP_MESSAGE(std::format("{}{}", "### WARNING: ", msg));           \
-    } while (false)
+    // do {                                                                               \
+    //     OCP_MESSAGE(std::format("{}{}", "### WARNING: ", msg));           \
+    // } while (false)
 
 /// Abort if critical error happens
 //  msg: user-defined abort message
 //  We use do-while to allow the macro to be ended with ";"
 #define OCP_ABORT(msg)                                                                 \
-    do {                                                                               \
-        OCP_MESSAGE(std::format("{}{}", "### ABORT: ", msg));  \
-        std::abort();                                                                  \
-    } while (false)
+    // do {                                                                               \
+    //     OCP_MESSAGE(std::format("{}{}", "### ABORT: ", msg));  \
+    //     std::abort();                                                                  \
+    // } while (false)
 
 /// Assert condition and log user messages in DEBUG mode
 //  cond: check condition
@@ -54,16 +54,16 @@
 //  We use do-while to allow the macro to be ended with ";"
 #ifndef DEBUG
 #define OCP_ASSERT(cond, msg)                                                          \
-    do {                                                                               \
-    } while (false)
+    // do {                                                                               \
+    // } while (false)
 #else
 #define OCP_ASSERT(cond, msg)                                                          \
-    do {                                                                               \
-        if (!(cond)) {                                                                 \
-            OCP_MESSAGE("### ASSERT: " << (msg) << " (" << #cond << ")");              \
-            std::abort();                                                              \
-        }                                                                              \
-    } while (false)
+    // do {                                                                               \
+    //     if (!(cond)) {                                                                 \
+    //         OCP_MESSAGE("### ASSERT: " << (msg) << " (" << #cond << ")");              \
+    //         std::abort();                                                              \
+    //     }                                                                              \
+    // } while (false)
 #endif
 
 
@@ -73,9 +73,9 @@
 //         std::cout << "###INFO: " << msg << "!\n";                                   \
 //     } while (false)                                                                    
 #define OCP_INFO(msg)  \
-    do {  \
-        std::cout << std::format("###INFO: {}\n", msg);  \
-    } while (false)
+    // do {  \
+    //     std::cout << std::format("###INFO: {}\n", msg);  \
+    // } while (false)
 
 
 
