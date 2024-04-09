@@ -23,7 +23,8 @@
 #include <numeric>
 #include <omp.h>
 #include <string>
-#include <intrin.h>
+#include <nmmintrin.h>
+#include <immintrin.h>
 
 using namespace std;
 
