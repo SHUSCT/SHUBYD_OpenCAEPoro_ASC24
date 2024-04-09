@@ -24,7 +24,7 @@ cmake_policy(SET CMP0076 NEW)
 project(OpenCAEPoroX C CXX)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # set(CMAKE_C_COMPILER "/home/jovyan/spack/opt/spack/linux-ubuntu22.04-icelake/gcc-11.4.0/gcc-13.2.0-bgq64dd7kw2njs367vx75e34rfgfrfey/bin/gcc")
 # set(CMAKE_CXX_COMPILER "/home/jovyan/spack/opt/spack/linux-ubuntu22.04-icelake/gcc-11.4.0/gcc-13.2.0-bgq64dd7kw2njs367vx75e34rfgfrfey/bin/g++")
