@@ -751,14 +751,14 @@ void OCPFluxT01::AssembleMatFIM(const BulkConnPair& bp, const OCP_USI& c, const 
     const HeatConductVarSet& hcvs = bk.optMs.heatConduct.GetVarSet();
 
     // >>>>>> [2024/Jan/08] jamesnulliu >>>>>>
-    // fill(dFdXpB.begin(), dFdXpB.end(), 0.0);
-    // fill(dFdXpE.begin(), dFdXpE.end(), 0.0);
-    // fill(dFdXsB.begin(), dFdXsB.end(), 0.0);
-    // fill(dFdXsE.begin(), dFdXsE.end(), 0.0);
-    std::ranges::fill(dFdXpB, 0.0);
-    std::ranges::fill(dFdXpE, 0.0);
-    std::ranges::fill(dFdXsB, 0.0);
-    std::ranges::fill(dFdXsE, 0.0);
+    fill(dFdXpB.begin(), dFdXpB.end(), 0.0);
+    fill(dFdXpE.begin(), dFdXpE.end(), 0.0);
+    fill(dFdXsB.begin(), dFdXsB.end(), 0.0);
+    fill(dFdXsE.begin(), dFdXsE.end(), 0.0);
+    // std::ranges::fill(dFdXpB, 0.0);
+    // std::ranges::fill(dFdXpE, 0.0);
+    // std::ranges::fill(dFdXsB, 0.0);
+    // std::ranges::fill(dFdXsE, 0.0);
     // >>>>>> [2024/Jan/08] jamesnulliu <<<<<<
 
     const USI ncol = nc + 2;
