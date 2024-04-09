@@ -198,7 +198,7 @@ namespace byd {
             else if constexpr (I + 1 < M)
                 DaABpbCHelper2<I + 1, 0, M, N, K, T>::compute(A, B, C);
         }
-    
+    /*
         static void compute_avx(const T* A, const T* B, T* C) {
             T r = A[I * K + L];
             __m128d n1 = _mm_set1_pd(r);
@@ -215,7 +215,7 @@ namespace byd {
             else if constexpr (I + 1 < M)
                 DaABpbCHelper2<I + 1, 0, M, N, K, T>::compute(A, B, C);
         }
-    
+    */
     };
 
     template <typename T>
