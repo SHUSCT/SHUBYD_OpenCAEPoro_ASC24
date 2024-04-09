@@ -23,6 +23,7 @@
 #include <numeric>
 #include <omp.h>
 #include <string>
+#include <intrin.h>
 
 using namespace std;
 
@@ -164,130 +165,6 @@ namespace byd {
     // [Note]
     //   This block is some implementations of ABpC with different methods.
     //   It is for sure that A(4*12) B(12*4) C(4*4), aka, m=4, n=4, k=12.
-
-    inline void DaABpbC_mkl(const int& m,
-                            const int& n,
-                            const int& k,
-                            const double& alpha,
-                            const double* A,
-                            const double* B,
-                            const double& beta,
-                            double* C) {
-        // A : m * k
-        // B : k * n
-        // C : m * n
-        // Call dgemm to perform the operation C = alpha*A*B + beta*C
-        const char transa = 'N', transb = 'N';
-        dgemm_(&transa, &transb, &n, &m, &k, &alpha, B, &n, A, &k, &beta, C, &n);
-    }
-
-
-    // @brief Computes C = AB + C with openmp and sse
-    inline void DaABpbC_openmp_sse(const double* a, const double* b, double* c, const int row1, const int col1, const int col2) {
-        #pragma omp parallel for shared(a, b, c)
-        for (int i = 0; i < row1; i++) {
-
-            for (int k = 0; k < col1; k++) {
-                double r = a[i * col1 + k];
-
-                // for(int j = 0; j < col2; j++){
-                // c[i * col2 + j] += (r * b[k * col2 + j]);
-                // }
-                for (int j = 0; j + 2 <= col2; j += 2) {
-                    __m128d k1 = _mm_set1_pd(r);
-                    __m128d k2 = _mm_loadu_pd(b + (k * col2 + j));
-
-                    __m128d k3 = _mm_mul_pd(k1, k2);
-
-                    k1 = _mm_loadu_pd(&c[i * col2 + j]);
-                    k2 = _mm_add_pd(k1, k3);
-                    _mm_storeu_pd(&c[i * col2 + j], k2);
-                    // c[i * col2 + j] += k3[0];
-                    // c[i * col2 + j + 1] += k3[1];
-                }
-
-                for (int j = col2 - col2 % 2; j < col2; j++) {
-                    c[i * col2 + j] += (r * b[k * col2 + j]);
-                }
-            }
-        }
-    }
-    // @brief Computes C = AB + C with openmp and avx256
-    inline void DaABpbC_openmp_avx(const double* a, const double* b, double* c, const int row1, const int col1, const int col2) {
-        #pragma omp parallel for shared(a, b, c)
-        for (int i = 0; i < row1; i++) {
-
-            for (int k = 0; k < col1; k++) {
-                double r = a[i * col1 + k];
-
-                for (int j = 0; j + 8 <= col2; j += 8) {
-                    __m512d k1 = _mm512_set1_pd(r);
-                    __m512d k2 = _mm512_loadu_pd(b + (k * col2 + j));
-
-                    __m512d k3 = _mm512_mul_pd(k1, k2);
-
-                    k1 = _mm512_loadu_pd(&c[i * col2 + j]);
-                    k2 = _mm512_add_pd(k1, k3);
-                    _mm512_storeu_pd(&c[i * col2 + j], k2);
-                }
-
-                for (int j = col2 - col2 % 8; j < col2; j++) {
-                    c[i * col2 + j] += (r * b[k * col2 + j]);
-                }
-            }
-        }
-    }
-
-    // @brief Computes C = AB + C with openmp
-    inline double calcuPartOfMatrixMulti(const double* A, const double* B, const int i, const int j, const int k, const int n) {
-        double sum = 0;
-        for (int l = 0; l < k; l++) {
-            sum += (double)A[i * k + l] * B[l * n + j];
-        }
-        return sum;
-    }
-
-    inline void DaABpbC_openmp(const int m,        // 4
-                               const int n,        // 4
-                               const int k,        // 12
-                               const double alpha, // 1
-                               const double* A,
-                               const double* B,
-                               const double beta, // 1
-                               double* C) {
-        #pragma omp parallel for collapse(2) shared(A, B, C)
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) { // C(i,j) = alpha * A(i,k) * B(k,j) + beta * C(i,j)
-                C[i * n + j] += calcuPartOfMatrixMulti(A, B, i, j, k, n);
-            }
-        }
-    }
-    // @brief Computes C = AB + C with openmp and simd
-    inline double calcuPartOfMatrixMulti_simd(const double* A, const double* B, const int i, const int j, const int k, const int n) {
-        double sum = 0;
-        #pragma omp simd reduction(+ : sum)
-        for (int l = 0; l < k; l++) {
-            sum += A[i * k + l] * B[l * n + j];
-        }
-        return sum;
-    }
-    inline void DaABpbC_openmp_simd(const int m,        // 4
-                                    const int n,        // 4
-                                    const int k,        // 12
-                                    const double alpha, // 1
-                                    const double* A,
-                                    const double* B,
-                                    const double beta, // 1
-                                    double* C) {
-        #pragma omp parallel for collapse(2) shared(A, B, C)
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) { // C(i,j) = alpha * A(i,k) * B(k,j) + beta * C(i,j)
-                C[i * n + j] += calcuPartOfMatrixMulti_simd(A, B, i, j, k, n);
-            }
-        }
-    }
-
-
     // @brief Computes C = ax with openmp
     inline void Dscal_openmp_simd(const int n, const double& alpha, OCP_DBL* x, const int incx) {
         const __m128d k1 = _mm_set1_pd(alpha);
@@ -303,27 +180,6 @@ namespace byd {
     }
 
 
-    template <int I, int J, int Row, int Col, typename T>
-    struct Transpose
-    {
-        static void run_unroll(const T* A, T* B) {
-            B[J * Row + I] = A[I * Col + J];
-            if constexpr (J + 1 < Col) {
-                Transpose<I, J + 1, Row, Col, T>::run_unroll(A, B);
-            } else if constexpr (I + 1 < Row) {
-                Transpose<I + 1, 0, Row, Col, T>::run_unroll(A, B);
-            }
-        }
-
-        static void run_openmp(const T* A, T* B) {
-            #pragma omp parallel for
-            for (int i = 0; i < Row; i++) {
-                for (int j = 0; j < Col; j++) {
-                    B[j * Row + i] = A[i * Col + j];
-                }
-            }
-        }
-    };
     template<int I, int L, int M, int N, int K, typename T>
     struct DaABpbCHelper2 {
         static void compute(const T* A, const T* B, T* C) {
@@ -342,6 +198,7 @@ namespace byd {
             else if constexpr (I + 1 < M)
                 DaABpbCHelper2<I + 1, 0, M, N, K, T>::compute(A, B, C);
         }
+    
         static void compute_avx(const T* A, const T* B, T* C) {
             T r = A[I * K + L];
             __m128d n1 = _mm_set1_pd(r);
@@ -404,9 +261,7 @@ inline void DaABpbC(const INT m,
 #if OCPFLOATTYPEWIDTH == 64
     // const char transa = 'N', transb = 'N';
     // dgemm_(&transa, &transb, &n, &m, &k, &alpha, B, &n, A, &k, &beta, C, &n);  //参数顺序example
-    // byd::DaABpbC_mkl(m, n, k, alpha, A, B, beta, C);
-    // byd::DaABpbC_unroll(alpha, beta, m, n, k, alpha, A, B, beta, C);
-    // byd::DaABpbC_openmp(m, n, k, alpha, A, B, beta, C);
+    // byd::DaABpbC_unroll(alpha, beta, m, n, k, alpha, A, B, beta, C);  //unroll无simd
     byd::DaABpbC_unroll_simd(m, n, k, alpha, A, B, beta, C);
 
 
