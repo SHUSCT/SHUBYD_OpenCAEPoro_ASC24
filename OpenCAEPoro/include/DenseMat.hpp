@@ -198,24 +198,6 @@ namespace byd {
             else if constexpr (I + 1 < M)
                 DaABpbCHelper2<I + 1, 0, M, N, K, T>::compute(A, B, C);
         }
-    /*
-        static void compute_avx(const T* A, const T* B, T* C) {
-            T r = A[I * K + L];
-            __m128d n1 = _mm_set1_pd(r);
-            for (int j = 0; j + 8 <= N; j += 8) {
-                __m512d n2 = _mm512_loadu_pd(B + (N * L + j));
-                __m512d n3 = _mm512_loadu_pd(C + (I * N + j));
-                _mm512_storeu_pd(C + (I * N + j), _mm512_add_pd(_mm_mul_pd(n1, n2), n3));
-            }
-            for (int j = N - N % 8; j < N; ++j) {
-                C[I * N + j] += (r * B[L * N +j]);
-            }
-            if constexpr (L + 1 < K)
-                DaABpbCHelper2<I, L + 1, M, N, K, T>::compute(A, B, C);
-            else if constexpr (I + 1 < M)
-                DaABpbCHelper2<I + 1, 0, M, N, K, T>::compute(A, B, C);
-        }
-    */
     };
 
     template <typename T>
