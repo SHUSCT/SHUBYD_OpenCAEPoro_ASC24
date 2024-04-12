@@ -183,7 +183,7 @@ template<int I, int L, int M, int N, int K, typename T>
 }
 
 /// Scales a vector by a constant.
-void Dscalar(const INT& n, const OCP_DBL& alpha, OCP_DBL* x)
+inline void Dscalar(const INT& n, const OCP_DBL& alpha, OCP_DBL* x)
 {
     
 
