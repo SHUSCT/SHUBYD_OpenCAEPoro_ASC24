@@ -33,18 +33,8 @@ OCP_DBL Dnorm2(const INT& N, OCP_DBL* x)
 #endif
 }
 
-void Dscalar(const INT& n, const OCP_DBL& alpha, OCP_DBL* x)
-{
 
-#if OCPFLOATTYPEWIDTH == 64
-    // x = a x
-    const int incx = 1;
-    dscal_(&n, &alpha, x, &incx);
-#else
-    OCP_scale(n, alpha, x);
-#endif
 
-}
 
 void Daxpy(const INT& n, const OCP_DBL& alpha, const OCP_DBL* x, OCP_DBL* y)
 {
@@ -55,32 +45,6 @@ void Daxpy(const INT& n, const OCP_DBL& alpha, const OCP_DBL* x, OCP_DBL* y)
     daxpy_(&n, &alpha, x, &incx, y, &incy);
 #else
     OCP_axpy(n, alpha, x, y);
-#endif
-}
-
-void DaABpbC(const INT&    m,
-             const INT&    n,
-             const INT&    k,
-             const OCP_DBL& alpha,
-             const OCP_DBL* A,
-             const OCP_DBL* B,
-             const OCP_DBL& beta,
-             OCP_DBL*       C)
-{
-    /*  C' = alpha B'A' + beta C'
-     *  A: m x k
-     *  B: k x n
-     *  C: m x n
-     *  all column majored matrices, no tranpose
-     *  A' in col-order in Fortran = A in row-order in C/Cpp
-     */
-
-#if OCPFLOATTYPEWIDTH == 64
-    const char transa = 'N', transb = 'N';
-    dgemm_(&transa, &transb, &n, &m, &k, &alpha, B, &n, A, &k, &beta, C, &n);
-
-#else
-    OCP_ABpC(m, n, k, A, B, C);
 #endif
 }
 
