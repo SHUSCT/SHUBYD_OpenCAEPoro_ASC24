@@ -152,7 +152,7 @@ void Dscalar(const INT& n, const OCP_DBL& alpha, OCP_DBL* x)
 #if OCPFLOATTYPEWIDTH == 64
     // x = a x
     const int incx = 1;
-    BYD::Dscal_openmp_simd(n, alpha, x, incx);
+    byd::Dscal_openmp_simd(n, alpha, x, incx);
 #else
     OCP_scale(n, alpha, x);
 #endif
