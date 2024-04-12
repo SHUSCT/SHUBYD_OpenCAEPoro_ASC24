@@ -143,29 +143,34 @@ T2 OCP_norm2(const T1& n, const T2* x)
     return sqrt(tmp);
 }
 namespace byd {
-template<int I, int L, int M, int N, int K, typename T>
-    struct DaABpbCHelper2 {
-        static void compute(const T* A, const T* B, T* C) {
-            T r = A[I * K + L];
-            __m128d n1 = _mm_set1_pd(r);
-            for (int j = 0; j + 2 <= N; j += 2) {
-                __m128d n2 = _mm_loadu_pd(B + (N * L + j));
-                __m128d n3 = _mm_loadu_pd(C + (I * N + j));
-                _mm_storeu_pd(C + (I * N + j), _mm_add_pd(_mm_mul_pd(n1, n2), n3));
-            }
-            for (int j = N - N % 2; j < N; ++j) {
-                C[I * N + j] += (r * B[L * N +j]);
-            }
-            if constexpr (L + 1 < K)
-                DaABpbCHelper2<I, L + 1, M, N, K, T>::compute(A, B, C);
-            else if constexpr (I + 1 < M)
-                DaABpbCHelper2<I + 1, 0, M, N, K, T>::compute(A, B, C);
-        }
-    };
+    inline void DaABpbC_openmp_sse(const double* a, const double* b, double* c, const int row1, const int col1, const int col2) {
+        #pragma omp parallel for shared(a, b, c)
+        for (int i = 0; i < row1; i++) {
 
-    template <typename T>
-    void DaABpbC_unroll_simd(const int m, const int n, const int k, const T& alpha, const T* A, const T* B, const T& beta, T* C) {
-        DaABpbCHelper2<0, 0, 4, 4, 12, T>::compute(A, B, C);
+            for (int k = 0; k < col1; k++) {
+                double r = a[i * col1 + k];
+
+                // for(int j = 0; j < col2; j++){
+                // c[i * col2 + j] += (r * b[k * col2 + j]);
+                // }
+                for (int j = 0; j + 2 <= col2; j += 2) {
+                    __m128d k1 = _mm_set1_pd(r);
+                    __m128d k2 = _mm_loadu_pd(b + (k * col2 + j));
+
+                    __m128d k3 = _mm_mul_pd(k1, k2);
+
+                    k1 = _mm_loadu_pd(&c[i * col2 + j]);
+                    k2 = _mm_add_pd(k1, k3);
+                    _mm_storeu_pd(&c[i * col2 + j], k2);
+                    // c[i * col2 + j] += k3[0];
+                    // c[i * col2 + j + 1] += k3[1];
+                }
+
+                for (int j = col2 - col2 % 2; j < col2; j++) {
+                    c[i * col2 + j] += (r * b[k * col2 + j]);
+                }
+            }
+        }
     }
     // @brief Computes C = ax with openmp
     inline void Dscal_openmp_simd(const int n, const double& alpha, OCP_DBL* x, const int incx) {
@@ -232,7 +237,7 @@ inline void DaABpbC(const INT&    m,
              const OCP_DBL& beta,
              OCP_DBL*       C){
                 #if OCPFLOATTYPEWIDTH == 64
-                byd::DaABpbC_unroll_simd(m, n, k, alpha, A, B, beta, C);
+                byd::DaABpbC_openmp_sse(m, n, k, alpha, A, B, beta, C);
                 #else
     OCP_ABpC(m, n, k, A, B, C);
 #endif
