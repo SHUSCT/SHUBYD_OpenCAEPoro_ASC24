@@ -23,7 +23,6 @@
 #include <numeric>
 #include <omp.h>
 #include <string>
-#include <immintrin.h>
 
 using namespace std;
 
@@ -165,6 +164,15 @@ namespace byd {
     // [Note]
     //   This block is some implementations of ABpC with different methods.
     //   It is for sure that A(4*12) B(12*4) C(4*4), aka, m=4, n=4, k=12.
+
+    
+
+
+    // @brief Computes C = AB + C with openmp
+
+
+
+
     // @brief Computes C = ax with openmp
     inline void Dscal_openmp_simd(const int n, const double& alpha, OCP_DBL* x, const int incx) {
         const __m128d k1 = _mm_set1_pd(alpha);
@@ -180,6 +188,7 @@ namespace byd {
     }
 
 
+    
     template<int I, int L, int M, int N, int K, typename T>
     struct DaABpbCHelper2 {
         static void compute(const T* A, const T* B, T* C) {
@@ -206,30 +215,13 @@ namespace byd {
     }
 
 
-    // Specializations for terminating the recursion
-    template <int I, int J, int K, int M, int N, int L, typename T>
-    struct DaABpbC_unroll_core
-    {
-        static void compute(const OCP_DBL& alpha, const OCP_DBL& beta, const T* A, const T* B, T* C) {
-            T sum = 0;
-            // #pragma omp parallel for reduction(+ : sum)
-            for (int l = 0; l < K; ++l) {
-                sum += alpha * A[I * L + l] * B[l * N + J];
-            }
-            C[I * N + J] = sum + beta * C[I * N + J];
-            if constexpr (J + 1 < N) {
-                DaABpbC_unroll_core<I, J + 1, K, M, N, L, T>::compute(alpha, beta, A, B, C);
-            } else if constexpr (I + 1 < M) {
-                DaABpbC_unroll_core<I + 1, 0, K, M, N, L, T>::compute(alpha, beta, A, B, C);
-            }
-        }
-
-    };
 
     template <typename T>
     void DaABpbC_unroll(const int m, const int n, const int k, const T& alpha, const T* A, const T* B, const T& beta, T* C) {
-        DaABpbC_unroll_core<0, 0, 12, 4, 4, 12, T>::compute(alpha, beta, A, B, C);
+        DaABpbC_unroll_core<0, 0, 12, 4, 4, 12, T>::compute(A, B, C);
     }
+
+   
 }
 
 /// Computes C' = alpha B'A' + beta C', all matrices are column-major.
@@ -242,9 +234,6 @@ inline void DaABpbC(const INT m,
                     const OCP_DBL& beta,
                     OCP_DBL* C) {
 #if OCPFLOATTYPEWIDTH == 64
-    // const char transa = 'N', transb = 'N';
-    // dgemm_(&transa, &transb, &n, &m, &k, &alpha, B, &n, A, &k, &beta, C, &n);  //参数顺序example
-    // byd::DaABpbC_unroll(alpha, beta, m, n, k, alpha, A, B, beta, C);  //unroll无simd
     byd::DaABpbC_unroll_simd(m, n, k, alpha, A, B, beta, C);
 
 
@@ -302,7 +291,6 @@ void OCP_aAxpby(const T1& m, const T1& n, const T2& a, const T2* A, const T2* x,
 }
 
 // [Jan,9,2024 jamesnulliu] >>>>>>
-
 
 
 // @brief Computes y = a A x + b y with openmp
@@ -376,7 +364,7 @@ void myDABpCp2(const int& m,
 template <typename T>
 void PrintDX(const int& N, const T* x) {
     for (int i = 0; i < N; i++) {
-        // std::cout << std::format("{:d}   {:f}\n", i, x[i]);
+        std::cout << std::format("{:d}   {:f}\n", i, x[i]);
     }
     cout << endl;
 }
@@ -403,12 +391,3 @@ inline void OCPSwap(T a, T b, const int& n, T w) {
 // <<<<<< [Jan,9,2024 jamesnulliu] <<<<<<
 
 #endif
-
-/*----------------------------------------------------------------------------*/
-/*  Brief Change History of This File                                         */
-/*----------------------------------------------------------------------------*/
-/*  Author              Date             Actions                              */
-/*----------------------------------------------------------------------------*/
-/*  Shizhe Li           Oct/24/2021      Create file                          */
-/*  Chensong Zhang      Jan/16/2022      Update Doxygen                       */
-/*----------------------------------------------------------------------------*/
