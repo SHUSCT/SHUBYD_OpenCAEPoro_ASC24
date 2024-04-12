@@ -223,7 +223,7 @@ void OCP_axpy(const T1& n, const T2& a, const T2* x, T2* y)
 
 
 /// Computes C' = alpha B'A' + beta C', all matrices are column-major.
-void DaABpbC(const INT&    m,
+inline void DaABpbC(const INT&    m,
              const INT&    n,
              const INT&    k,
              const OCP_DBL& alpha,
@@ -236,7 +236,6 @@ void DaABpbC(const INT&    m,
                 #else
     OCP_ABpC(m, n, k, A, B, C);
 #endif
-
              }
 
 /// Computes C = AB + C
