@@ -165,12 +165,102 @@ namespace byd {
     //   This block is some implementations of ABpC with different methods.
     //   It is for sure that A(4*12) B(12*4) C(4*4), aka, m=4, n=4, k=12.
 
-    
+    inline void DaABpbC_mkl(const int& m,
+                            const int& n,
+                            const int& k,
+                            const double& alpha,
+                            const double* A,
+                            const double* B,
+                            const double& beta,
+                            double* C) {
+        // A : m * k
+        // B : k * n
+        // C : m * n
+        // Call dgemm to perform the operation C = alpha*A*B + beta*C
+        const char transa = 'N', transb = 'N';
+        dgemm_(&transa, &transb, &n, &m, &k, &alpha, B, &n, A, &k, &beta, C, &n);
+    }
+
+    // @brief Computes C = AB + C with openmp and sse
+    inline void DaABpbC_openmp_sse(const double* a, const double* b, double* c, const int row1, const int col1, const int col2) {
+        #pragma omp parallel for shared(a, b, c)
+        for (int i = 0; i < row1; i++) {
+
+            for (int k = 0; k < col1; k++) {
+                double r = a[i * col1 + k];
+
+                // for(int j = 0; j < col2; j++){
+                // c[i * col2 + j] += (r * b[k * col2 + j]);
+                // }
+                for (int j = 0; j + 2 <= col2; j += 2) {
+                    __m128d k1 = _mm_set1_pd(r);
+                    __m128d k2 = _mm_loadu_pd(b + (k * col2 + j));
+
+                    __m128d k3 = _mm_mul_pd(k1, k2);
+
+                    k1 = _mm_loadu_pd(&c[i * col2 + j]);
+                    k2 = _mm_add_pd(k1, k3);
+                    _mm_storeu_pd(&c[i * col2 + j], k2);
+                    // c[i * col2 + j] += k3[0];
+                    // c[i * col2 + j + 1] += k3[1];
+                }
+
+                for (int j = col2 - col2 % 2; j < col2; j++) {
+                    c[i * col2 + j] += (r * b[k * col2 + j]);
+                }
+            }
+        }
+    }
 
 
     // @brief Computes C = AB + C with openmp
+    inline double calcuPartOfMatrixMulti(const double* A, const double* B, const int i, const int j, const int k, const int n) {
+        double sum = 0;
+        for (int l = 0; l < k; l++) {
+            sum += (double)A[i * k + l] * B[l * n + j];
+        }
+        return sum;
+    }
 
-
+    inline void DaABpbC_openmp(const int m,        // 4
+                               const int n,        // 4
+                               const int k,        // 12
+                               const double alpha, // 1
+                               const double* A,
+                               const double* B,
+                               const double beta, // 1
+                               double* C) {
+        #pragma omp parallel for collapse(2) shared(A, B, C)
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) { // C(i,j) = alpha * A(i,k) * B(k,j) + beta * C(i,j)
+                C[i * n + j] += calcuPartOfMatrixMulti(A, B, i, j, k, n);
+            }
+        }
+    }
+    // @brief Computes C = AB + C with openmp and simd
+    inline double calcuPartOfMatrixMulti_simd(const double* A, const double* B, const int i, const int j, const int k, const int n) {
+        double sum = 0;
+        #pragma omp simd reduction(+ : sum)
+        for (int l = 0; l < k; l++) {
+            sum += A[i * k + l] * B[l * n + j];
+        }
+        return sum;
+    }
+    inline void DaABpbC_openmp_simd(const int m,        // 4
+                                    const int n,        // 4
+                                    const int k,        // 12
+                                    const double alpha, // 1
+                                    const double* A,
+                                    const double* B,
+                                    const double beta, // 1
+                                    double* C) {
+        #pragma omp parallel for collapse(2) shared(A, B, C)
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) { // C(i,j) = alpha * A(i,k) * B(k,j) + beta * C(i,j)
+                C[i * n + j] += calcuPartOfMatrixMulti_simd(A, B, i, j, k, n);
+            }
+        }
+    }
 
 
     // @brief Computes C = ax with openmp
@@ -188,7 +278,27 @@ namespace byd {
     }
 
 
-    
+    template <int I, int J, int Row, int Col, typename T>
+    struct Transpose
+    {
+        static void run_unroll(const T* A, T* B) {
+            B[J * Row + I] = A[I * Col + J];
+            if constexpr (J + 1 < Col) {
+                Transpose<I, J + 1, Row, Col, T>::run_unroll(A, B);
+            } else if constexpr (I + 1 < Row) {
+                Transpose<I + 1, 0, Row, Col, T>::run_unroll(A, B);
+            }
+        }
+
+        static void run_openmp(const T* A, T* B) {
+            #pragma omp parallel for
+            for (int i = 0; i < Row; i++) {
+                for (int j = 0; j < Col; j++) {
+                    B[j * Row + i] = A[i * Col + j];
+                }
+            }
+        }
+    };
     template<int I, int L, int M, int N, int K, typename T>
     struct DaABpbCHelper2 {
         static void compute(const T* A, const T* B, T* C) {
@@ -215,13 +325,50 @@ namespace byd {
     }
 
 
+    // Specializations for terminating the recursion
+    template <int I, int J, int K, int M, int N, int L, typename T>
+    struct DaABpbC_unroll_core
+    {
+        static void compute(const T* A, const T* B, T* C) {
+            T sum = 0;
+            // #pragma omp parallel for reduction(+ : sum)
+            for (int l = 0; l < K; ++l) {
+                sum += A[I * L + l] * B[l * N + J];
+            }
+            C[I * N + J] = sum + C[I * N + J];
+            if constexpr (J + 1 < N) {
+                DaABpbC_unroll_core<I, J + 1, K, M, N, L, T>::compute(A, B, C);
+            } else if constexpr (I + 1 < M) {
+                DaABpbC_unroll_core<I + 1, 0, K, M, N, L, T>::compute(A, B, C);
+            }
+        }
+
+        static void compute_transposed_B(const T* A, const T* B, T* C) {
+            T sum = 0;
+            // #pragma omp parallel for reduction(+ : sum)
+            for (int l = 0; l < K; ++l) {
+                sum += A[I * L + l] * B[J * L + l];
+            }
+            C[I * N + J] = sum + C[I * N + J];
+            if constexpr (J + 1 < N) {
+                DaABpbC_unroll_core<I, J + 1, K, M, N, L, T>::compute_transposed_B(A, B, C);
+            } else if constexpr (I + 1 < M) {
+                DaABpbC_unroll_core<I + 1, 0, K, M, N, L, T>::compute_transposed_B(A, B, C);
+            }
+        }
+    };
 
     template <typename T>
     void DaABpbC_unroll(const int m, const int n, const int k, const T& alpha, const T* A, const T* B, const T& beta, T* C) {
         DaABpbC_unroll_core<0, 0, 12, 4, 4, 12, T>::compute(A, B, C);
     }
 
-   
+    template <typename T, typename _Pred>
+    void DaABpbc_unroll_transpose_B(const int m, const int n, const int k, const T& alpha, const T* A, const T* B, const T& beta, T* C, _Pred _pred) {
+        T* transposed_B = new T[12 * 4];
+        _pred(B, transposed_B);
+        DaABpbC_unroll_core<0, 0, 12, 4, 4, 12, T>::compute_transposed_B(A, transposed_B, C);
+    }
 }
 
 /// Computes C' = alpha B'A' + beta C', all matrices are column-major.
@@ -234,7 +381,14 @@ inline void DaABpbC(const INT m,
                     const OCP_DBL& beta,
                     OCP_DBL* C) {
 #if OCPFLOATTYPEWIDTH == 64
-    byd::DaABpbC_unroll_simd(m, n, k, alpha, A, B, beta, C);
+    // const char transa = 'N', transb = 'N';
+    // dgemm_(&transa, &transb, &n, &m, &k, &alpha, B, &n, A, &k, &beta, C, &n);  //参数顺序example
+    // byd::DaABpbC_mkl(m, n, k, alpha, A, B, beta, C);
+    // byd::DaABpbC_unroll(m, n, k, alpha, A, B, beta, C);
+    byd::DaABpbC_openmp(m, n, k, alpha, A, B, beta, C);
+    // byd::DaABpbc_unroll_transpose_B(m, n, k, alpha, A, B, beta, C, byd::Transpose<0, 0, 12, 4, OCP_DBL>::run_unroll);
+    // byd::DaABpbc_unroll_transpose_B(m, n, k, alpha, A, B, beta, C, byd::Transpose<0, 0, 12, 4, OCP_DBL>::run_openmp);
+    // byd::DaABpbC_unroll_simd(m, n, k, alpha, A, B, beta, C);
 
 
 #else
@@ -391,3 +545,12 @@ inline void OCPSwap(T a, T b, const int& n, T w) {
 // <<<<<< [Jan,9,2024 jamesnulliu] <<<<<<
 
 #endif
+
+/*----------------------------------------------------------------------------*/
+/*  Brief Change History of This File                                         */
+/*----------------------------------------------------------------------------*/
+/*  Author              Date             Actions                              */
+/*----------------------------------------------------------------------------*/
+/*  Shizhe Li           Oct/24/2021      Create file                          */
+/*  Chensong Zhang      Jan/16/2022      Update Doxygen                       */
+/*----------------------------------------------------------------------------*/
