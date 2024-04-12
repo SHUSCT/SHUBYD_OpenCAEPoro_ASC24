@@ -237,7 +237,7 @@ inline void DaABpbC(const INT&    m,
              const OCP_DBL& beta,
              OCP_DBL*       C){
                 #if OCPFLOATTYPEWIDTH == 64
-    byd::DaABpbC_openmp_sse(A, B, C, m, n, k);
+    byd::DaABpbC_openmp_sse(A, B, C, m, k, n);
 #else
     OCP_ABpC(m, n, k, A, B, C);
 #endif
