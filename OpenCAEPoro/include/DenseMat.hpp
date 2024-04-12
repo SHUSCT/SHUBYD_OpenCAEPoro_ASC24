@@ -160,8 +160,7 @@ namespace byd {
                     __m128d k3 = _mm_mul_pd(k1, k2);
 
                     k1 = _mm_loadu_pd(&c[i * col2 + j]);
-                    k2 = _mm_add_pd(k1, k3);
-                    _mm_storeu_pd(&c[i * col2 + j], k2);
+                    _mm_storeu_pd(&c[i * col2 + j], _mm_add_pd(k1, k3));
                     // c[i * col2 + j] += k3[0];
                     // c[i * col2 + j + 1] += k3[1];
                 }
